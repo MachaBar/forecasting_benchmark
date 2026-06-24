@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# TensorBoard
+tensorboard/
+runs/
+
+jobs/
+opera-python/
+outputs_smach/
+ICLR26/
+generation/
+TimePoint/
+
+# WandB
+wandb/
+
+# Hydra outputs
+outputs/
+multirun/
+
+# Checkpoints
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+
+# Logs
+*.log
+
+# Data
+data/
+datasets/
+*.parquet
+*.npy
+*.npz
+*.pkl
+*.csv
+
+# OS files
+.DS_Store
+Thumbs.db
