@@ -1,0 +1,21 @@
+path: "/home/d32485/forecasting_phd_2026/data/cer/cer/load_curve.parquet"
+path_client_split: "/home/d32485/forecasting_phd_2026/data/cer/cer/train_valid_test_id_split.pkl" 
+timestamp_col: "time"
+inference_path: "/home/d32485/forecasting_phd_2026/data/cer/cer/load_curve.parquet"
+real_rmse: 1067.6997
+name: null
+# === Windowing ===
+context_length: 512      # 2 weeks
+prediction_length: 96    # 2 days
+stride: 96
+
+# === PDL selection ===
+list_pdl: null
+proportion_ids: null     # e.g. 0.2
+seed: 42
+splits: null
+
+# === Normalization ===
+normalize: true
+
+real_proportion: 1.0

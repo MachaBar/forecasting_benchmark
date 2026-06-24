@@ -1,0 +1,24 @@
+path: "/home/d32485/forecasting_phd_2026/data/smach/load_curve.parquet"
+path_client_split: "/home/d32485/forecasting_phd_2026/data/smach/train_valid_test_id_split.pkl" 
+timestamp_col: "HORODATAGE"
+inference_path: "/home/d32485/forecasting_phd_2026/data/smach/load_curve.parquet"
+# real_rmse: 600.29724
+real_rmse: 623.0663
+
+name: null
+
+# === Windowing ===
+context_length: 512      # 2 weeks
+prediction_length: 96    # 2 days
+stride: ${dataset.prediction_length}
+
+# === PDL selection ===
+list_pdl: null
+proportion_ids: null     # e.g. 0.2
+seed: 42
+splits: null
+
+# === Normalization ===
+normalize: true
+
+real_proportion: 1.0

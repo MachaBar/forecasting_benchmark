@@ -1,0 +1,91 @@
+defaults:
+  - dataset: cer
+  - model: patchtst
+  - train: default
+
+device: cuda
+test:
+  # exp_path_smach: /home/d32485/forecasting_phd_2026/outputs/2026-03-06/11-50-14/outputs/PatchTST_2026-03-06_11-50-15 # SMACH
+  # exp_path_cer: /home/d32485/forecasting_phd_2026/outputs/2026-03-07/10-46-15/outputs/PatchTST_2026-03-07_10-46-16 # CER
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-09/13-44-33/outputs/PatchTST_2026-03-09_13-44-34 # CER BIS
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/23-59-20/outputs_smach_real/PatchTST_2026-03-11_23-59-21 #SMACH
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-12/00-07-18/outputs_cer_real/PatchTST_2026-03-12_00-07-19 # CER
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-12/00-07-44/outputs_cerbis_real/PatchTST_2026-03-12_00-07-44 # CERBIS 
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/17-45-40/outputs_smach/loadiff/PatchTST_2026-03-11_17-45-41 
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/19-18-44/outputs_smach/timegan/PatchTST_2026-03-11_19-18-45
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/20-51-27/outputs_smach/timevae/PatchTST_2026-03-11_20-51-28
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/22-24-44/outputs_smach/timevqvae/PatchTST_2026-03-11_22-24-44
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/23-52-54/outputs_smach/timeweaver/PatchTST_2026-03-11_23-52-54
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/16-12-52/outputs_smach/diffusion_ts/PatchTST_2026-03-11_16-12-53
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/19-17-24/outputs_cerbis/loadiff/PatchTST_2026-03-11_19-17-25
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/20-50-26/outputs_cerbis/timegan/PatchTST_2026-03-11_20-50-27
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/22-19-50/outputs_cerbis/timevae/PatchTST_2026-03-11_22-19-50
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/23-52-41/outputs_cerbis/timeweaver/PatchTST_2026-03-11_23-52-41
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/18-14-56/outputs_cer/diffusion_ts/PatchTST_2026-03-11_18-14-57
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/19-48-25/outputs_cer/loadiff/PatchTST_2026-03-11_19-48-25
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/21-21-23/outputs_cer/timegan/PatchTST_2026-03-11_21-21-23
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-11/22-45-25/outputs_cer/timevae/PatchTST_2026-03-11_22-45-25
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-12/00-18-28/outputs_cer/timeweaver/PatchTST_2026-03-12_00-18-29
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-03-12/11-51-08/outputs_cer/timevqvae/PatchTST_2026-03-12_11-51-09
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/PatchTST_energydiff_smach/ctx512_pred96/2026-05-31_11-30-30/outputs_smach/energydiff/PatchTST_2026-05-31_11-30-30
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/PatchTST_energydiff_cerbis/ctx512_pred96/2026-05-31_10-52-47/outputs_cer/energydiff/PatchTST_2026-05-31_10-52-48
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs_smach/PatchTST/ctx512_pred96/2026-05-31_09-31-47/outputs_cer/energydiff/PatchTST_2026-05-31_09-31-47
+  #########################
+  # cer
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/11-28-39/outputs_cer/diffusion_ts/PatchTST_2026-06-02_11-28-40
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/14-12-19/outputs_cer/energydiff/PatchTST_2026-06-02_14-12-19
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/16-35-59/outputs_smach/real_cer/PatchTST_2026-06-02_16-35-59
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/16-54-40/outputs_cer/loadiff/PatchTST_2026-06-02_16-54-41
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/19-37-07/outputs_cer/timegan/PatchTST_2026-06-02_19-37-08
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/22-25-16/outputs_cer/timevae/PatchTST_2026-06-02_22-25-17
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/01-06-30/outputs_cer/timevqvae/PatchTST_2026-06-03_01-06-31
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/03-46-43/outputs_cer/timeweaver/PatchTST_2026-06-03_03-46-44
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/19-08-45/outputs_cer_real_proportion_1.0/energydiff/PatchTST_2026-06-03_19-08-46
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/01-29-45/outputs_cer_real_proportion_1.0/loadiff/PatchTST_2026-06-04_01-29-46
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/07-52-49/outputs_cer_real_proportion_1.0/timegan/PatchTST_2026-06-04_07-52-49
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/15-49-21/outputs_cer_real_proportion_1.0/timevae/PatchTST_2026-06-04_15-49-22
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/22-12-49/outputs_cer_real_proportion_1.0/timevqvae/PatchTST_2026-06-04_22-12-50
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-05/04-36-25/outputs_cer_real_proportion_1.0/timeweaver/PatchTST_2026-06-05_04-36-25
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-05/10-35-45/outputs_cer_real_proportion_1.0/diffusion_ts/PatchTST_2026-06-05_10-35-46
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-05/15-58-32/outputs_cer/loadiff_cond/PatchTST_2026-06-05_15-58-32
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-05/16-07-22/outputs_cer_real_proportion_1.0/loadiff_cond/PatchTST_2026-06-05_16-07-22
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-06/18-33-47/outputs_cer/timeweaver_cond/PatchTST_2026-06-06_18-33-48
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-06/20-47-18/outputs_cer/gmm/PatchTST_2026-06-06_20-47-18
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-06/18-45-10/outputs_cer_real_proportion_1.0/timeweaver_cond/PatchTST_2026-06-06_18-45-10
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-07/01-36-41/correct_outputs_cer_real_proportion_1.0/timeweaver_cond/PatchTST_2026-06-07_01-36-41
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-07/09-29-47/correct_outputs_cer_real_proportion_1.0/gmm/PatchTST_2026-06-07_09-29-47
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-07/09-29-47/correct_outputs_cer_real_proportion_1.0/gmm/PatchTST_2026-06-07_09-29-47
+  exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-11/23-49-01/outputs_cer_steps/load_curve.parquet/PatchTST_2026-06-11_23-49-01
+  # cerbis
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/12-09-21/outputs_cerbis/diffusion_ts/PatchTST_2026-06-02_12-09-21
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/17-59-05/outputs/real_cer_bis/PatchTST_2026-06-02_17-59-05
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/17-36-06/outputs_cerbis/loadiff/PatchTST_2026-06-02_17-36-07
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/14-54-56/outputs_cerbis/energydiff/PatchTST_2026-06-02_14-54-56
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/20-20-07/outputs_cerbis/timegan/PatchTST_2026-06-02_20-20-07
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/01-44-25/outputs_cerbis/timevqvae/PatchTST_2026-06-03_01-44-26
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/04-24-52/outputs_cerbis/timeweaver/PatchTST_2026-06-03_04-24-53
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/23-02-10/outputs_cerbis/timevae/PatchTST_2026-06-02_23-02-11
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/19-02-15/outputs_cerbisreal_proportion_1.0/energydiff/PatchTST_2026-06-03_19-02-15
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/00-14-06/outputs_cerbisreal_proportion_1.0/loadiff/PatchTST_2026-06-04_00-14-06
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/05-31-31/outputs_cerbisreal_proportion_1.0/timegan/PatchTST_2026-06-04_05-31-31
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/10-46-53/outputs_cerbisreal_proportion_1.0/timevae/PatchTST_2026-06-04_10-46-53
+  # smach
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/16-51-47/outputs/real_smach/PatchTST_2026-06-02_16-51-48
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/12-36-25/outputs_smach/diffusion_ts/PatchTST_2026-06-02_12-36-26
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-02/15-18-11/outputs_smach/energydiff/PatchTST_2026-06-02_15-18-11
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/00-13-05/outputs_smach/loadiff/PatchTST_2026-06-03_00-13-06
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/02-02-52/outputs_smach/timevqvae/PatchTST_2026-06-03_02-02-53
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/02-54-13/outputs_smach/timegan/PatchTST_2026-06-03_02-54-13
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/04-47-21/outputs_smach/timeweaver/PatchTST_2026-06-03_04-47-22
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/05-35-34/outputs_smach/timevae/PatchTST_2026-06-03_05-35-35
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/14-08-25/outputs_smach_real_proportion_1.0/diffusion_ts/PatchTST_2026-06-03_14-08-26
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-03/22-08-56/outputs_smach_real_proportion_1.0/energydiff/PatchTST_2026-06-03_22-08-57
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/06-09-07/outputs_smach_real_proportion_1.0/loadiff/PatchTST_2026-06-04_06-09-08
+  # exp_path: /home/d32485/forecasting_phd_2026/outputs/2026-06-04/14-10-20/outputs_smach_real_proportion_1.0/timegan/PatchTST_2026-06-04_14-10-21
+  batch_size: 256
+  synth: True
+
+
+# hydra:
+#   run:
+#     dir: outputs/${model.name}_energydiff_cerbis/ctx${dataset.context_length}_pred${dataset.prediction_length}/${now:%Y-%m-%d_%H-%M-%S}

@@ -1,0 +1,49 @@
+# === Data ===
+c_in: 1
+individual: 0
+
+# === Patch ===
+patch_len: 16
+stride: 8
+padding_patch: None
+
+# === Transformer ===
+n_layers: 3
+n_heads: 16
+d_model: 128
+d_ff: 256
+
+d_k: null
+d_v: null
+
+dropout: 0.2
+attn_dropout: 0.0
+fc_dropout: 0.2
+head_dropout: 0.0
+
+act: gelu
+
+# === Attention ===
+key_padding_mask: auto
+padding_var: null
+attn_mask: null
+res_attention: true
+pre_norm: false
+store_attn: false
+
+# === Positional Encoding ===
+pe: zeros
+learn_pe: true
+
+# === Head ===
+pretrain_head: false
+head_type: flatten
+
+verbose: false
+
+name: "PatchTST"
+
+# === Windowing ===
+context_window: 512      # 2 weeks
+target_window: 96    # 2 days
+# stride: 96
