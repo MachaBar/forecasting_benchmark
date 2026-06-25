@@ -1,8 +1,8 @@
 # @package _global_.dataset
 # Override paths on the CLI or in a local .env-style override file:
 #   python -m scripts.train_patchtst dataset.path=/data/cer/load_curve.parquet
-path: ???
-path_client_split: ???
+path: /home/d32485/forecasting_benchmark/data/cer/cer/load_curve.parquet
+path_client_split: /home/d32485/forecasting_benchmark/data/cer/cer/train_valid_test_id_split.pkl
 timestamp_col: "time"
 layout: "wide"
 

@@ -27,7 +27,7 @@ from statsforecast.models import AutoARIMA, AutoETS, AutoTheta, Naive, SeasonalN
 from statsforecast.utils import ConformalIntervals
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from helpers.dataset_general import (
+from dataset.dataset import (
     client_ids_to_indices,
     eval_batch,
     load_client_split_pickle,
@@ -84,7 +84,7 @@ def quantile_preds_for_model(
     return quantile_preds
 
 
-@hydra.main(config_path="../configs", config_name="config_statistical_baselines", version_base=None)
+@hydra.main(config_path="../../configs", config_name="config_statistical_baselines", version_base=None)
 def main(cfg: DictConfig) -> None:
     # Hydra changes the working directory by default — resolve paths
     # against the original launch directory instead.
