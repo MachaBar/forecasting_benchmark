@@ -7,4 +7,4 @@ output_dir: "outputs/statistical"
 
 hydra:
   run:
-    dir: outputs/statistical/${dataset.name}/${model.max_lookback}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: outputs/statistical/${dataset.name}/max_lookback_${model.max_lookback}/${now:%Y-%m-%d_%H-%M-%S}

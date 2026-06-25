@@ -14,7 +14,7 @@ set -euo pipefail
 mkdir -p jobs
 source .venv/bin/activate
 
-REPO=/chemin/vers/forecasting_benchmark
+REPO=/home/d32485/forecasting_benchmark
 
 # # CER — point forecast
 # srun python3 -m src.baselines.run_statistical_baselines \
@@ -25,8 +25,6 @@ REPO=/chemin/vers/forecasting_benchmark
 # CER — probabiliste
 srun python3 -m src.baselines.run_statistical_baselines \
   dataset=cer \
-  dataset.path=$REPO/data/cer/load_curve.parquet \
-  dataset.path_client_split=$REPO/data/cer/split.pkl \
   model.probabilistic=true \
   model.max_lookback=512 
 
