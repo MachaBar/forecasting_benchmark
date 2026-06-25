@@ -1,13 +1,19 @@
 # @package _global_.model
-name: "chronos"
+name: "chronos2"
 
-# HuggingFace model id — swap to chronos-t5-base / -large / bolt-small / bolt-base
-model_id: "amazon/chronos-t5-small"
-device: "cuda"
+weights_path: "/home/d32485/timetensor/src/timetensor/sota/chronos2/weights"
+device_map: "cuda"
 torch_dtype: "bfloat16"
 
 batch_size: 32
-num_samples: 20   # probabilistic samples; median used as point forecast
+num_samples: 20
 
-# null = inherit dataset.prediction_length
-prediction_length: null
+# Probabilistic output: predict_quantiles() returns these levels
+probabilistic: true
+quantile_levels: [0.1, 0.5, 0.9]
+
+# Season length for MASE (match your dataset's periodicity)
+# Daily cycle @ 30-min steps = 48; hourly = 24
+season_length: 48
+
+include_mape: false
