@@ -16,22 +16,23 @@ source .venv/bin/activate
 
 REPO=/chemin/vers/forecasting_benchmark
 
-# CER — point forecast
-srun python3 -m src.baselines.run_statistical_baselines \
-  dataset=cer \
-  dataset.path=$REPO/data/cer/load_curve.parquet \
-  dataset.path_client_split=$REPO/data/cer/split.pkl
+# # CER — point forecast
+# srun python3 -m src.baselines.run_statistical_baselines \
+#   dataset=cer \
+#   dataset.path=$REPO/data/cer/load_curve.parquet \
+#   dataset.path_client_split=$REPO/data/cer/split.pkl
 
 # CER — probabiliste
 srun python3 -m src.baselines.run_statistical_baselines \
   dataset=cer \
   dataset.path=$REPO/data/cer/load_curve.parquet \
   dataset.path_client_split=$REPO/data/cer/split.pkl \
-  model.probabilistic=true
+  model.probabilistic=true \
+  model.max_lookback=512 
 
-# SMACH — saison horaire
-srun python3 -m src.baselines.run_statistical_baselines \
-  dataset=smach \
-  dataset.path=$REPO/data/smach/data.parquet \
-  dataset.path_client_split=$REPO/data/smach/split.pkl \
-  model.season_length=48
+# # SMACH — saison horaire
+# srun python3 -m src.baselines.run_statistical_baselines \
+#   dataset=smach \
+#   dataset.path=$REPO/data/smach/data.parquet \
+#   dataset.path_client_split=$REPO/data/smach/split.pkl \
+#   model.season_length=48
