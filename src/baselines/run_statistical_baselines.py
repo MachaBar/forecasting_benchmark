@@ -33,6 +33,7 @@ from dataset.dataset import (
     load_client_split_pickle,
     load_dataset,
     make_sliding_cutoffs,
+    make_cutoffs,
     to_statsforecast_history_df,
 )
 from utils.metrics import compute_metrics
@@ -106,13 +107,21 @@ def main(cfg: DictConfig) -> None:
     test_indices = client_ids_to_indices(ts, split["test"])
     print(f"{len(test_indices)} / {len(split['test'])} test client IDs matched in the loaded data.")
 
-    cutoffs = make_sliding_cutoffs(
-        ts,
-        lags=cfg.dataset.context_length,
-        horizon=cfg.dataset.prediction_length,
-        stride=cfg.dataset.stride,
-        max_windows=cfg.model.get("max_windows"),
-    )
+    # cutoffs = make_sliding_cutoffs(
+    #     ts,
+    #     lags=cfg.dataset.context_length,
+    #     horizon=cfg.dataset.prediction_length,
+    #     stride=cfg.dataset.stride,
+    #     max_windows=cfg.model.get("max_windows"),
+    # )
+    splits = make_cutoffs(
+    ts,
+    lags=cfg.dataset.context_length,
+    horizon=cfg.dataset.prediction_length,
+    step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+)
+    cutoffs = splits["test_cutoffs"].tolist()
     print(f"{len(cutoffs)} evaluation windows on the test clients' shared timeline.")
 
     is_probabilistic = cfg.model.get("probabilistic", False)

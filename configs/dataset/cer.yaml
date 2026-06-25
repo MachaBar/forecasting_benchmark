@@ -10,4 +10,5 @@ context_length: 512    # 2 weeks @ 30-min steps
 prediction_length: 96  # 2 days  @ 30-min steps
 stride: 96
 
+ratios: "0.7,0.15,0.15"
 name: "cer"
