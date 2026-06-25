@@ -35,7 +35,7 @@ from helpers.dataset_general import (
     make_sliding_cutoffs,
     to_statsforecast_history_df,
 )
-from helpers.metrics import compute_metrics
+from utils.metrics import compute_metrics
 
 MODEL_REGISTRY = {
     "Naive": Naive,
