@@ -658,3 +658,24 @@ def to_tsicl_inputs(
     n_users = context.shape[0]
     covars = np.broadcast_to(covars, (n_users, *covars.shape)).copy()  # shared across clients
     return context, covars
+
+import pickle
+
+def load_client_split_pickle(path: str | Path) -> dict:
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+def client_ids_to_indices(ts: TimeSeriesFrame, client_ids) -> list[int]:
+    name_to_idx = {name: i for i, name in enumerate(ts.user_names)}
+    return [name_to_idx[str(cid)] for cid in client_ids if str(cid) in name_to_idx]
+
+def make_sliding_cutoffs(
+    ts: TimeSeriesFrame, *, lags: int, horizon: int, stride: int, max_windows: int | None = None
+) -> list[int]:
+    last = ts.n_dates - lags - horizon
+    if last < 0:
+        raise ValueError(f"Series too short ({ts.n_dates}) for lags={lags}+horizon={horizon}")
+    cutoffs = list(range(0, last + 1, stride))
+    if max_windows is not None:
+        cutoffs = cutoffs[-max_windows:]
+    return cutoffs

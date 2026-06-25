@@ -11,7 +11,27 @@
 #SBATCH -e ./jobs/%j.err
 
 set -euo pipefail
-
 mkdir -p jobs
 source .venv/bin/activate
-srun python3 -m src.baselines.run_statistical_baselines
+
+REPO=/chemin/vers/forecasting_benchmark
+
+# CER — point forecast
+srun python3 -m src.baselines.run_statistical_baselines \
+  dataset=cer \
+  dataset.path=$REPO/data/cer/load_curve.parquet \
+  dataset.path_client_split=$REPO/data/cer/split.pkl
+
+# CER — probabiliste
+srun python3 -m src.baselines.run_statistical_baselines \
+  dataset=cer \
+  dataset.path=$REPO/data/cer/load_curve.parquet \
+  dataset.path_client_split=$REPO/data/cer/split.pkl \
+  model.probabilistic=true
+
+# SMACH — saison horaire
+srun python3 -m src.baselines.run_statistical_baselines \
+  dataset=smach \
+  dataset.path=$REPO/data/smach/data.parquet \
+  dataset.path_client_split=$REPO/data/smach/split.pkl \
+  model.season_length=48
