@@ -1,0 +1,13 @@
+# @package _global_.model
+name: "chronos"
+
+# HuggingFace model id — swap to chronos-t5-base / -large / bolt-small / bolt-base
+model_id: "amazon/chronos-t5-small"
+device: "cuda"
+torch_dtype: "bfloat16"
+
+batch_size: 32
+num_samples: 20   # probabilistic samples; median used as point forecast
+
+# null = inherit dataset.prediction_length
+prediction_length: null

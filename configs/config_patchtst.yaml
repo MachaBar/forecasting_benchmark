@@ -1,0 +1,15 @@
+defaults:
+  - dataset: cer
+  - model: patchtst
+  - train: default
+  - _self_
+
+device: cuda
+seed: 42
+n_samples: 50000   # total training windows drawn per epoch-equivalent
+
+output_dir: "outputs/patchtst"
+
+hydra:
+  run:
+    dir: outputs/patchtst/${dataset.name}/ctx${dataset.context_length}_pred${dataset.prediction_length}/${now:%Y-%m-%d_%H-%M-%S}

@@ -1,0 +1,10 @@
+defaults:
+  - dataset: cer
+  - model: chronos
+  - _self_
+
+output_dir: "outputs/chronos"
+
+hydra:
+  run:
+    dir: outputs/chronos/${dataset.name}/${model.model_id}/${now:%Y-%m-%d_%H-%M-%S}

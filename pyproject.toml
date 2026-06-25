@@ -24,12 +24,11 @@ dependencies = [
     "pyarrow>=20.0.0",
     "rotary-embedding-torch==0.8.6",
     "seaborn>=0.13.2",
-    "sktime>=0.37.0",
     "statsforecast>=2.0.3",
     "statsmodels>=0.14.5",
     "tensorboard>=2.19.0",
     "torch>=2.4.1",
-    "uni2ts",
+    "tsicl>=0.2.0",
     "xformers>=0.0.28.post1",
     "xgboost>=3.0.4",
 ]
@@ -41,13 +40,10 @@ dev = [
     "thrift-sasl>=0.4.3",
     "oracledb>=3.1.1",
     "sqlalchemy>=2.0.41",
-    "opera",
     "requests==2.27.1",
+    "ipykernel>=7.3.0",
 ]
 
-[tool.uv.sources]
-uni2ts = { git = "https://github.com/SalesforceAIResearch/uni2ts.git" }
-opera = { path = "opera-python" }
 
 [tool.uv.workspace]
 members = [

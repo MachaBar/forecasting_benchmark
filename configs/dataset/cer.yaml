@@ -1,0 +1,13 @@
+# @package _global_.dataset
+# Override paths on the CLI or in a local .env-style override file:
+#   python -m scripts.train_patchtst dataset.path=/data/cer/load_curve.parquet
+path: ???
+path_client_split: ???
+timestamp_col: "time"
+layout: "wide"
+
+context_length: 512    # 2 weeks @ 30-min steps
+prediction_length: 96  # 2 days  @ 30-min steps
+stride: 96
+
+name: "cer"

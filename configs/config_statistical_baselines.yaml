@@ -1,0 +1,10 @@
+defaults:
+  - dataset: cer
+  - model: statistical
+  - _self_
+
+output_dir: "outputs/statistical"
+
+hydra:
+  run:
+    dir: outputs/statistical/${dataset.name}/${now:%Y-%m-%d_%H-%M-%S}

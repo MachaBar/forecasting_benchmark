@@ -1,0 +1,9 @@
+# @package _global_.train
+batch_size: 1024
+max_steps: 200000
+learning_rate: 1.0e-5
+save_every: 10000
+log_every: 1000
+val_every: 2000
+resume: false
+resume_path: null

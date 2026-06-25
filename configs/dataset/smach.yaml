@@ -1,0 +1,11 @@
+# @package _global_.dataset
+path: ???
+path_client_split: ???
+timestamp_col: "time"
+layout: "wide"
+
+context_length: 512
+prediction_length: 96
+stride: 96
+
+name: "smach"
