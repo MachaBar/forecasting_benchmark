@@ -205,13 +205,17 @@ def main(cfg: DictConfig) -> None:
 
     # Final consolidated save
     results = pd.DataFrame(rows)
-    results.to_csv(cfg.output_dir / "results_per_client_cutoff.csv", index=False)
+    # results.to_csv(cfg.output_dir / "results_per_client_cutoff.csv", index=False)
+    # output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    results.to_csv(output_dir / "results_per_client_cutoff.csv", index=False)
 
     metric_cols = [c for c in results.columns if c not in ("unique_id", "cutoff", "model")]
     summary = results.groupby("model")[metric_cols].mean().sort_values("mase")
     print("\n=== Mean over all TEST clients and evaluation windows ===")
     print(summary)
-    summary.to_csv(cfg.output_dir / "summary_by_model.csv")
+    # summary.to_csv(cfg.output_dir / "summary_by_model.csv")
+    summary.to_csv(output_dir / "summary_by_model.csv")
 
     # rows: list[dict] = []
     # for cutoff in cutoffs:
