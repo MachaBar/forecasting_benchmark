@@ -3,8 +3,11 @@ defaults:
   - model: chronos
   - _self_
 
-output_dir: "outputs/chronos2"
+output_dir: "."
 
 hydra:
   run:
-    dir: outputs/chronos2/${dataset.name}/ctx${dataset.context_length}_h${dataset.prediction_length}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: outputs/chronos2/${dataset.name}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/chronos2/${dataset.name}/multirun
+    subdir: ctx${dataset.context_length}_h${dataset.prediction_length}
