@@ -6,7 +6,7 @@ models:
   - SeasonalNaive
   - AutoTheta
   - AutoETS
-  - AutoARIMA
+  # - AutoARIMA
 
 # Daily cycle @ 30-min steps = 48; hourly data = 24
 season_length: 48

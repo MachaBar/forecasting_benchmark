@@ -24,7 +24,7 @@ REPO=/home/d32485/forecasting_benchmark
 
 # CER — probabiliste
 srun python3 -m src.baselines.run_statistical_baselines \
-  dataset=cer \
+  dataset=cer_bis \
   model.probabilistic=true \
   model.max_lookback=512 
 

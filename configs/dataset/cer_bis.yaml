@@ -1,6 +1,6 @@
 # @package _global_.dataset
-path: ???
-path_client_split: ???
+path: /home/d32485/forecasting_benchmark/data/cer_bis/load_curve.parquet
+path_client_split: /home/d32485/forecasting_benchmark/data/cer_bis/train_valid_test_id_split.pkl
 timestamp_col: "time"
 layout: "wide"
 

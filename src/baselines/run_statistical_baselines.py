@@ -43,7 +43,7 @@ MODEL_REGISTRY = {
     "SeasonalNaive": SeasonalNaive,
     "AutoTheta": AutoTheta,
     "AutoETS": AutoETS,
-    "AutoARIMA": AutoARIMA,
+    # "AutoARIMA": AutoARIMA,
 }
 
 
@@ -52,7 +52,7 @@ def build_models(cfg: DictConfig) -> list:
     if cfg.model.get("probabilistic", False) and cfg.model.get("use_conformal_intervals", True):
         # Same conformal-prediction method for every model, regardless of
         # whether it has its own native intervals — keeps interval widths
-        # comparable across model types (cf. discussion).
+        # comparable across model types
         intervals = ConformalIntervals(
             h=cfg.dataset.prediction_length,
             n_windows=cfg.model.get("conformal_n_windows", 2),
@@ -94,6 +94,13 @@ def main(cfg: DictConfig) -> None:
 
     ts = load_dataset(data_path, layout="wide", date_col=cfg.dataset.timestamp_col)
 
+    # Dataset info
+    print(f"Dataset: {cfg.dataset.name}")
+    print(f"Clients: {ts.n_users}")
+    print(f"Timesteps: {ts.n_dates}")
+    print(f"Date range: {ts.datetimes[0]} → {ts.datetimes[-1]}")
+    print(f"Total duration: {(ts.datetimes[-1] - ts.datetimes[0])}")
+
     inferred_freq = pd.infer_freq(pd.DatetimeIndex(ts.datetimes))
     if inferred_freq is None:
         raise ValueError(
@@ -122,7 +129,15 @@ def main(cfg: DictConfig) -> None:
     ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
 )
     cutoffs = splits["test_cutoffs"].tolist()
-    print(f"{len(cutoffs)} evaluation windows on the test clients' shared timeline.")
+    print(f"\n=== Evaluation scope ===")
+    print(f"Clients  : {len(test_indices)} test clients")
+    print(f"           IDs: {[ts.user_names[i] for i in test_indices[:5]]} ... {[ts.user_names[i] for i in test_indices[-3:]]}")
+    print(f"Windows  : {len(cutoffs)} test cutoffs")
+    print(f"           first: {cutoffs[0]}  ({ts.datetimes[cutoffs[0]]})")
+    print(f"           last : {cutoffs[-1]} ({ts.datetimes[cutoffs[-1]]})")
+    print(f"           stride: {cutoffs[1] - cutoffs[0]} steps = {(cutoffs[1] - cutoffs[0]) * 0.5:.0f}h")
+    print(f"Total evals: {len(test_indices)} × {len(cutoffs)} cutoffs × {len(cfg.model.models)} models = {len(test_indices)*len(cutoffs)*len(cfg.model.models):,} fits")
+    print(f"========================\n")
 
     is_probabilistic = cfg.model.get("probabilistic", False)
     levels = list(cfg.model.get("level", [])) if is_probabilistic else []
@@ -135,12 +150,15 @@ def main(cfg: DictConfig) -> None:
     )
 
     rows: list[dict] = []
-    for cutoff in cutoffs:
-        print(f"Fitting on cutoff={cutoff} ({len(cutoffs)} total)...")
+    output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = output_dir / "results_checkpoint.csv"
+
+    for cutoff_idx, cutoff in enumerate(cutoffs):
+        print(f"Fitting on cutoff={cutoff} ({cutoff_idx+1}/{len(cutoffs)})...")
 
         df_history = to_statsforecast_history_df(
-            ts,
-            cutoff,
+            ts, cutoff,
             lags=cfg.dataset.context_length,
             users=test_indices,
             max_lookback=cfg.model.get("max_lookback"),
@@ -149,9 +167,11 @@ def main(cfg: DictConfig) -> None:
         forecast = sf.forecast(df=df_history, h=cfg.dataset.prediction_length, **forecast_kwargs)
 
         truth = eval_batch(
-            ts, cutoff, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length, users=test_indices
+            ts, cutoff, lags=cfg.dataset.context_length,
+            horizon=cfg.dataset.prediction_length, users=test_indices,
         )
 
+        cutoff_rows: list[dict] = []
         for i, uid in enumerate(truth["item_ids"]):
             client_idx = test_indices[i]
             y_true = truth["y"][i, 0].numpy()
@@ -163,31 +183,90 @@ def main(cfg: DictConfig) -> None:
                 if model_name not in fc_rows.columns:
                     continue
                 y_pred = fc_rows[model_name].to_numpy()
-
                 quantile_preds = (
                     quantile_preds_for_model(fc_rows, model_name, levels) if is_probabilistic else None
                 )
                 metrics = compute_metrics(
-                    y_true,
-                    y_pred,
+                    y_true, y_pred,
                     context=context_window,
                     history=history_series,
                     season_length=cfg.model.season_length,
                     include_mape=cfg.model.get("include_mape", False),
                     quantile_preds=quantile_preds,
                 )
-                rows.append({"unique_id": uid, "cutoff": cutoff, "model": model_name, **metrics.to_dict()})
+                cutoff_rows.append({"unique_id": uid, "cutoff": cutoff, "model": model_name, **metrics.to_dict()})
 
+        rows.extend(cutoff_rows)
+
+        # Progressive save after each cutoff
+        write_header = not checkpoint_path.exists()
+        pd.DataFrame(cutoff_rows).to_csv(checkpoint_path, mode="a", header=write_header, index=False)
+        print(f"  → checkpoint saved ({len(rows)} rows total)")
+
+    # Final consolidated save
     results = pd.DataFrame(rows)
-    output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
-    output_dir.mkdir(parents=True, exist_ok=True)
-    results.to_csv(output_dir / "results_per_client_cutoff.csv", index=False)
+    results.to_csv(cfg.output_dir / "results_per_client_cutoff.csv", index=False)
 
     metric_cols = [c for c in results.columns if c not in ("unique_id", "cutoff", "model")]
     summary = results.groupby("model")[metric_cols].mean().sort_values("mase")
     print("\n=== Mean over all TEST clients and evaluation windows ===")
     print(summary)
-    summary.to_csv(output_dir / "summary_by_model.csv")
+    summary.to_csv(cfg.output_dir / "summary_by_model.csv")
+
+    # rows: list[dict] = []
+    # for cutoff in cutoffs:
+    #     print(f"Fitting on cutoff={cutoff} ({len(cutoffs)} total)...")
+
+    #     df_history = to_statsforecast_history_df(
+    #         ts,
+    #         cutoff,
+    #         lags=cfg.dataset.context_length,
+    #         users=test_indices,
+    #         max_lookback=cfg.model.get("max_lookback"),
+    #     )
+    #     forecast_kwargs = {"level": levels} if is_probabilistic else {}
+    #     forecast = sf.forecast(df=df_history, h=cfg.dataset.prediction_length, **forecast_kwargs)
+
+    #     truth = eval_batch(
+    #         ts, cutoff, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length, users=test_indices
+    #     )
+
+    #     for i, uid in enumerate(truth["item_ids"]):
+    #         client_idx = test_indices[i]
+    #         y_true = truth["y"][i, 0].numpy()
+    #         context_window = truth["x"][i, 0].numpy()
+    #         history_series = ts.values[: cutoff + cfg.dataset.context_length, client_idx]
+
+    #         fc_rows = forecast.loc[forecast["unique_id"] == uid].sort_values("ds")
+    #         for model_name in cfg.model.models:
+    #             if model_name not in fc_rows.columns:
+    #                 continue
+    #             y_pred = fc_rows[model_name].to_numpy()
+
+    #             quantile_preds = (
+    #                 quantile_preds_for_model(fc_rows, model_name, levels) if is_probabilistic else None
+    #             )
+    #             metrics = compute_metrics(
+    #                 y_true,
+    #                 y_pred,
+    #                 context=context_window,
+    #                 history=history_series,
+    #                 season_length=cfg.model.season_length,
+    #                 include_mape=cfg.model.get("include_mape", False),
+    #                 quantile_preds=quantile_preds,
+    #             )
+    #             rows.append({"unique_id": uid, "cutoff": cutoff, "model": model_name, **metrics.to_dict()})
+
+    # results = pd.DataFrame(rows)
+    # output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
+    # output_dir.mkdir(parents=True, exist_ok=True)
+    # results.to_csv(output_dir / "results_per_client_cutoff.csv", index=False)
+
+    # metric_cols = [c for c in results.columns if c not in ("unique_id", "cutoff", "model")]
+    # summary = results.groupby("model")[metric_cols].mean().sort_values("mase")
+    # print("\n=== Mean over all TEST clients and evaluation windows ===")
+    # print(summary)
+    # summary.to_csv(output_dir / "summary_by_model.csv")
 
 
 if __name__ == "__main__":

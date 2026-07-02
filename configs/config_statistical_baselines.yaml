@@ -1,5 +1,5 @@
 defaults:
-  - dataset: cer
+  - dataset: cer_bis
   - model: statistical
   - _self_
 

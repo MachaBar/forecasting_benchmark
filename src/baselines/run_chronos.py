@@ -1,3 +1,4 @@
+
 """Zero-shot inference with Chronos-2.
 
 Run from the repo root:
@@ -66,15 +67,18 @@ def _save_forecast_plot(
     print(f"Diagnostic plot saved → {path}")
 
 
-@hydra.main(config_path="../configs", config_name="config_chronos", version_base=None)
+@hydra.main(config_path="../../configs", config_name="config_chronos", version_base=None)
 def main(cfg: DictConfig) -> None:
     try:
         from chronos import Chronos2Pipeline
     except ImportError:
-        raise ImportError(
-            "chronos is not installed. "
-            "Run: pip install chronos-forecasting  (or uv add chronos-forecasting)"
-        )
+        try:
+            from chronos.chronos2 import Chronos2Pipeline as Chronos2Pipeline  # v1.x fallback
+        except ImportError:
+            raise ImportError(
+                "chronos is not installed. "
+                "Run: pip install chronos-forecasting  (or uv add chronos-forecasting)"
+            )
 
     data_path = hydra.utils.to_absolute_path(cfg.dataset.path)
     split_path = hydra.utils.to_absolute_path(cfg.dataset.path_client_split)
@@ -101,7 +105,7 @@ def main(cfg: DictConfig) -> None:
     pipeline = Chronos2Pipeline.from_pretrained(
         cfg.model.weights_path,
         device_map=cfg.model.device_map,
-        torch_dtype=getattr(torch, cfg.model.torch_dtype),
+        dtype=getattr(torch, cfg.model.torch_dtype),
         local_files_only=True,
     )
 
@@ -112,6 +116,7 @@ def main(cfg: DictConfig) -> None:
     quantile_levels = sorted(set(plot_quantiles + (list(cfg.model.get("quantile_levels", [])) if is_probabilistic else [])))
     batch_size = cfg.model.get("batch_size", 32)
     season_length = cfg.model.get("season_length", cfg.dataset.get("season_length", 48))
+    has_predict_quantiles = hasattr(pipeline, "predict_quantiles")
 
     # Fixed window index (first test cutoff) and first test client used for the diagnostic plot
     plot_cutoff_idx = 0
@@ -137,19 +142,44 @@ def main(cfg: DictConfig) -> None:
 
         # Run inference in mini-batches to avoid OOM
         quantile_forecasts = []  # list of (batch, n_quantiles, horizon)
+        raw_samples_list = []   # v1 fallback: list of (batch, n_samples, horizon)
         for start in range(0, n_clients, batch_size):
             end = min(start + batch_size, n_clients)
             context_batch = [x[i, 0] for i in range(start, end)]
-            qf = pipeline.predict_quantiles(
-                context_batch,
-                prediction_length=prediction_length,
-                quantile_levels=quantile_levels,
-                num_samples=num_samples,
-            )
-            # predict_quantiles returns (batch, n_quantiles, horizon) tensor
-            quantile_forecasts.append(qf.numpy() if isinstance(qf, torch.Tensor) else np.array(qf))
+            if has_predict_quantiles:
+                # Chronos v2: num_samples is not accepted by predict_quantiles
+                qf_result = pipeline.predict_quantiles(
+                    context_batch,
+                    prediction_length=prediction_length,
+                    quantile_levels=quantile_levels,
+                )
+                if isinstance(qf_result, (tuple, list)):
+                    n_q = len(quantile_levels)
+                    def _to_np(t):
+                        return t.numpy() if isinstance(t, torch.Tensor) else np.asarray(t)
+                    candidates = [_to_np(qf_result[0]), _to_np(qf_result[1])] if len(qf_result) >= 2 else [_to_np(qf_result[0])]
+                    qf = next((c for c in candidates if c.ndim >= 2 and c.shape[1] == n_q), candidates[0])
+                else:
+                    qf = qf_result.numpy() if isinstance(qf_result, torch.Tensor) else np.asarray(qf_result)
+                qf = qf.numpy() if isinstance(qf, torch.Tensor) else np.asarray(qf)
+                if qf.ndim == 4:
+                    qf = qf.reshape(qf.shape[0], qf.shape[1], -1)  # (batch, n_quantiles, horizon)
+                quantile_forecasts.append(qf.numpy() if isinstance(qf, torch.Tensor) else np.array(qf))
+            else:
+                # Chronos v1: predict returns (batch, n_samples, horizon)
+                samples = pipeline.predict(
+                    context_batch,
+                    prediction_length=prediction_length,
+                    num_samples=num_samples,
+                )
+                raw_samples_list.append(samples.numpy() if isinstance(samples, torch.Tensor) else np.array(samples))
 
-        all_qf = np.concatenate(quantile_forecasts, axis=0)  # (n_clients, n_quantiles, horizon)
+        if has_predict_quantiles:
+            all_qf = np.concatenate(quantile_forecasts, axis=0)  # (n_clients, n_quantiles, horizon)
+        else:
+            # Convert samples to quantiles
+            all_samples = np.concatenate(raw_samples_list, axis=0)  # (n_clients, n_samples, horizon)
+            all_qf = np.quantile(all_samples, quantile_levels, axis=1).transpose(1, 0, 2)  # (n_clients, n_quantiles, horizon)
 
         for i, uid in enumerate(batch["item_ids"]):
             client_idx = test_indices[i]
