@@ -1,0 +1,14 @@
+{
+  "dataset": "cer_bis",
+  "context_length": 512,
+  "prediction_length": 48,
+  "stride": 96,
+  "ratios": "0.7,0.15,0.15",
+  "n_train_clients": 1457,
+  "n_val_clients": 208,
+  "n_train_positions": 11704,
+  "n_samples": 50000,
+  "max_steps": 200000,
+  "batch_size": 1024,
+  "learning_rate": 0.0001
+}

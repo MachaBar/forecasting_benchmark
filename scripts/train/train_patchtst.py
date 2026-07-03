@@ -109,6 +109,22 @@ def _val_metrics(model, ts, cutoffs, cfg, device, val_indices, season_length):
     model.train()
     return pd.DataFrame(all_rows).mean(numeric_only=True).to_dict()
 
+from torch.utils.data._utils.collate import default_collate
+
+def collate_drop_none(batch):
+    """Collate that skips keys whose values are None (e.g. covariates on
+    datasets without them) and non-tensor metadata."""
+    keys = batch[0].keys()
+    out = {}
+    for k in keys:
+        vals = [d[k] for d in batch]
+        if vals[0] is None:
+            out[k] = None                    # garde la clé mais ne collate pas
+        elif isinstance(vals[0], (str,)):
+            out[k] = vals                    # métadonnées (item_id, dates) → liste
+        else:
+            out[k] = default_collate(vals)
+    return out
 
 @hydra.main(config_path="../../configs", config_name="config_patchtst", version_base=None)  # <-- ../../configs
 def main(cfg: DictConfig) -> None:
@@ -148,7 +164,7 @@ def main(cfg: DictConfig) -> None:
         client_pool=train_indices,   # excludes val AND test clients
         seed=cfg.seed,
     )
-    loader = DataLoader(train_ds, batch_size=cfg.train.batch_size, num_workers=4, pin_memory=True)
+    loader = DataLoader(train_ds, batch_size=cfg.train.batch_size, num_workers=0, pin_memory=True,collate_fn=collate_drop_none)
 
     device = torch.device(cfg.device if torch.cuda.is_available() else "cpu")
     model = build_model(cfg).to(device)
@@ -160,7 +176,9 @@ def main(cfg: DictConfig) -> None:
 )
     criterion = nn.MSELoss()
 
-    output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
+    # output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
+    from hydra.core.hydra_config import HydraConfig
+    output_dir = Path(HydraConfig.get().runtime.output_dir)
     tb_dir = output_dir / "tensorboard"
     writer = SummaryWriter(log_dir=str(tb_dir))
     print(f"TensorBoard logs → {tb_dir}")
