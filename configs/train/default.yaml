@@ -1,13 +1,13 @@
 # @package _global_.train
 batch_size: 1024
 max_steps: 200000
-learning_rate: 1.0e-5
+learning_rate: 1.0e-4
 save_every: 10000
 log_every: 1000
 val_every: 2000
 resume: false
 resume_path: null
-metrics_every: 10000     # métriques complètes (MASE...) sur val
-save_every: 10000
+metrics_every: 20000     # métriques complètes (MASE...) sur val
 early_stopping_patience: 10
 early_stopping_min_delta: 1.0e-5
+eta_min: 1.0e-7   # LR minimum atteint en fin de cosine

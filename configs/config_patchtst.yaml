@@ -16,3 +16,7 @@ hydra:
   sweep:
     dir: outputs/patchtst/${dataset.name}/multirun
     subdir: ctx${dataset.context_length}_h${dataset.prediction_length}
+
+eval:
+  run_dir: ???            # obligatoire : chemin du dossier de training à évaluer
+  checkpoint: best_model.pth

@@ -153,6 +153,11 @@ def main(cfg: DictConfig) -> None:
     device = torch.device(cfg.device if torch.cuda.is_available() else "cpu")
     model = build_model(cfg).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.train.learning_rate)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=cfg.train.max_steps,
+    eta_min=cfg.train.get("eta_min", 1e-7),
+)
     criterion = nn.MSELoss()
 
     output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
@@ -197,6 +202,7 @@ def main(cfg: DictConfig) -> None:
             "step": step,
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
+            "scheduler": scheduler.state_dict(),
             "best_val": best_val,
             "best_step": best_step,
         }
@@ -217,6 +223,7 @@ def main(cfg: DictConfig) -> None:
             loss = criterion(model(x), y)
             loss.backward()
             optimizer.step()
+            scheduler.step() 
 
             if step % cfg.train.log_every == 0:
                 print(f"step={step:>7d}  train_loss={loss.item():.6f}")
