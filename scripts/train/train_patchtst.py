@@ -164,7 +164,7 @@ def main(cfg: DictConfig) -> None:
         client_pool=train_indices,   # excludes val AND test clients
         seed=cfg.seed,
     )
-    loader = DataLoader(train_ds, batch_size=cfg.train.batch_size, num_workers=0, pin_memory=True,collate_fn=collate_drop_none)
+    loader = DataLoader(train_ds, batch_size=cfg.train.batch_size, pin_memory=True,collate_fn=collate_drop_none)
 
     device = torch.device(cfg.device if torch.cuda.is_available() else "cpu")
     model = build_model(cfg).to(device)
@@ -229,6 +229,7 @@ def main(cfg: DictConfig) -> None:
         torch.save(payload, path)
 
     model.train()
+    print("Start training")
     while step < cfg.train.max_steps and not stop_training:
         for batch in loader:
             if step >= cfg.train.max_steps:
@@ -236,6 +237,7 @@ def main(cfg: DictConfig) -> None:
 
             x = batch["x"].to(device)   # (B, 1, ctx)
             y = batch["y"].to(device)   # (B, 1, horizon)
+            print("x shape: ",x.shape)
 
             optimizer.zero_grad()
             loss = criterion(model(x), y)

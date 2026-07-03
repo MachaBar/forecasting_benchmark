@@ -38,9 +38,17 @@ class TimeSeriesFrame:
     past_covariates: pd.DataFrame | None = None
     future_covariates: pd.DataFrame | None = None
 
+    # @property
+    # def values(self) -> np.ndarray:
+    #     return self.frame.to_numpy(dtype=np.float32)
+
     @property
     def values(self) -> np.ndarray:
-        return self.frame.to_numpy(dtype=np.float32)
+        cache = getattr(self, "_values_cache", None)
+        if cache is None:
+            cache = self.frame.to_numpy(dtype=np.float32)
+            object.__setattr__(self, "_values_cache", cache)
+        return cache
 
     @property
     def datetimes(self) -> list[Any]:
