@@ -7,7 +7,7 @@ log_every: 1000
 val_every: 2000
 resume: false
 resume_path: null
-metrics_every: 10000     # métriques complètes (MASE...) sur val, plus rare car coûteux
+metrics_every: 10000     # métriques complètes (MASE...) sur val
 save_every: 10000
 early_stopping_patience: 10
 early_stopping_min_delta: 1.0e-5

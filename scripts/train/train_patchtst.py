@@ -249,6 +249,9 @@ def main(cfg: DictConfig) -> None:
                 print(f"step={step:>7d}  val_mase={vm.get('mase', float('nan')):.4f}")
 
             step += 1
+        writer.close()
+    pd.DataFrame(train_history).to_csv(output_dir / "history_train.csv", index=False)
+    pd.DataFrame(val_history).to_csv(output_dir / "history_val.csv", index=False)
 
 
 if __name__ == "__main__":

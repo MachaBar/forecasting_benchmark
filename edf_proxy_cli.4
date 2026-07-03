@@ -1,0 +1,260 @@
+#!/bin/bash
+#set -x
+
+me=edf_proxy_cli
+
+# URL pour tester le proxy
+# Le '/' final est important car ça permet de comparer au champ 'Location'
+# de l'entête de réponse 'curl'
+probe_url="http://nonexistentdomain.domain/"
+
+# Les proxy
+proxy_sesame=vip-users.proxy.edf.fr:3128
+proxy_kerberos=vip-users.proxy.edf.fr:3131
+
+
+usage () {
+  cat <<EOF
+Usage: $me -k [-t <keytab>] [-q]
+       $me -s [-u <user>] [-p <password> | -P] [-q]
+
+Authentification proxy EDF en ligne de commande et affichage des
+variables d'environnement pour une utilisation avec 'eval':
+
+  $ eval \$($me ...)
+
+Options :
+       -h|--help	Ce message d'aide
+       -k|--kerberos	Authentification Kerberos
+       -t|--keytab	Keytab pour l'authentification Kerberos
+       -s|--sesame	Authentification SESAME
+       -u|--user <user>	Utilisateur pour l'authentification SESAME
+			Si ce paramètre n'est pas présent la variable \$USER est utilisée
+       -p|--passfile <file>
+			Chemin de fichier contenant le mot de passe SESAME
+			Si ce paramètre n'est pas présent le mot de passe est attendu sur l'entrée standard
+       -q|--quiet	Mode silencieux
+
+EOF
+}
+
+# Affiche un message d'erreur
+# Si le code d'erreur passé en premier paramètre est < 10
+# on affiche également l'aide
+# On sort avec le code d'erreur passé en paramètre
+error () {
+  ret_code="$1"
+  msg="$2"
+  if [ -n "$msg" ]; then
+    echo "$msg" >&2
+    echo "" >&2
+  fi
+  if [ "$ret_code" -lt 10 ]; then
+    usage >&2
+  fi
+  exit $ret_code
+}
+
+# Affiche un message sur la sortie d'erreur si et seulement si
+# on n'est pas en mode silencieux
+verbose () {
+  if [ -z "$quiet" ]; then
+    echo "$@" >&2
+  fi
+}
+
+# Configure et exporte les variables d'environnement passées
+# en paramètre sous la forme VAR1=value1 VAR2=...
+# Les lignes d'export sont aussi affichées sur la sortie standard
+# pour permettre l'usage du script avec eval
+export_vars () {
+  while [ -n "$1" ]; do
+    echo "$1; export ${1%%=*}"
+    eval "export $1"
+    shift
+  done
+}
+
+# Extrait le code réponse HTTP et le header 'Location' d'une
+# entête réponse curl
+parse_curl_result () {
+  # Suppression du dernier caractère de chaque ligne car curl ajoute
+  # un caractère spécial qui met le bazar
+  _response="$(echo "$1" | grep -E '^(HTTP|Location)' | sed -E 's/.$//')"
+  http_code="$(echo "$_response" | grep '^HTTP' | cut -d ' ' -f 2)"
+  http_message="$(echo "$_response" | grep '^HTTP' | cut -d ' ' -f 3)"
+  http_location="$(echo "$_response" | grep '^Location' | cut -d ' ' -f 2)"
+}
+
+# Vérification si le proxy est ouvert
+# Tente une requête 'curl' sur l'URL de test
+# Si une le proxy est OK ça retourne un code 502 avec le message 'notresolvable'
+# Sinon ça retourne une redirection vers l'authentification (SESAME) ou des
+# info sur le protocole d'authentification (Kerberos)
+check_proxy_status () {
+  response="$(curl -s -I -x "$proxy" "$probe_url")" || {
+    error 40 "Erreur de connexion au proxy"
+  }
+  parse_curl_result "$response"
+  [ "$http_code" = 502 ] && [ "$http_message" = notresolvable ] && verbose "Proxy opérationnel" || return 10
+}
+
+# Si pas de token Kerberos et mode interactif on permet la génération
+# d'un nouveau token avec kinit
+check_renew_kerberos_ticket () {
+  if ! klist -s >/dev/null; then
+    if [ -n "$PS1" -a -z "$keytab" ]; then
+      verbose "Un ticket Kerberos doit être initialisé"
+      kinit >&2 || return 10
+    elif [ -n "$keytab" ]; then
+      verbose "Initialisation ticket Kerberos via la keytab fournie"
+      kinit -k -t "$keytab" >&2 || return 10
+    else
+      error 10 "Pas de ticket Kerberos valide - Mode non interactif - Pas de keytab"
+    fi
+  fi
+  verbose "Ticket Kerberos OK"
+}
+
+# Auth Kerberos - On check d'abord le ticket, puis on montre patte
+# blanche au proxy
+do_kerberos_auth () {
+  check_renew_kerberos_ticket || return $?
+  response="$(curl -s -I -x "$proxy_kerberos" --proxy-negotiate --user : "$probe_url")" || {
+    error 40 "Erreur de connexion au proxy"
+  }
+  parse_curl_result "$response"
+  [ "$http_code" = 502 ] && [ "$http_message" = notresolvable ] && verbose "Proxy opérationnel" || {
+    error 40 "Erreur proxy"
+  }
+}
+
+# Implémentation de l'authentification Kerberos
+# 1. on vérifie si on a une session existante
+# 2. si ce n'est pas le cas on s'authentifie
+do_kerberos () {
+  verbose "Mode Kerberos activé"
+  proxy="$proxy_kerberos"
+  check_proxy_status || do_kerberos_auth
+}
+
+# Récupération du mot de passe SESAME
+# Via l'entrée standard si aucun nom de fichier n'a été spécifié
+# via les options
+get_sesame_pass () {
+  if [ "$passfile" = - ]; then
+    verbose -n "Mot de passe SESAME: "
+    read -s passwd
+    verbose ""
+  else
+    if [ ! -r "$passfile" ]; then
+      error 30 "Fichier '$passfile' inexistant ou non accessible en lecture"
+    fi
+    read passwd <"$passfile"
+  fi
+}
+
+# Authentification Basic sur le lien retourné par le test de
+# session ci-dessus
+# En cas d'erreur autre que 401 on affiche l'entête réponse de curl
+do_sesame_auth () {
+  get_sesame_pass
+  creds="$(echo "$user:$passwd" | base64)"
+  response="$(curl -I -H "Authorization: Basic $creds" --noproxy '*' -s "$http_location")" || {
+    error 40 "Erreur de connexion au proxy SESAME"
+  }
+  parse_curl_result "$response"
+  case "$http_code" in
+    401)
+      error 40 "Mauvais mot de passe"
+      ;;
+    302)
+      [ "$http_message" = redirected ] && [ "$http_location" = "$probe_url" ] && verbose "Authentification SESAME réussie" && return
+      error 40 "$response"
+      ;;
+    *)
+      error 40 "$response"
+      ;;
+  esac
+}
+
+# Implémentation de l'authentification SESAME
+# 1. on vérifie si on a une session existante
+# 2. si ce n'est pas le cas on s'authentifie
+do_sesame () {
+  verbose "Mode SESAME activé"
+  proxy="$proxy_sesame"
+  check_proxy_status || do_sesame_auth
+}
+
+# Traitement des options via 'getopt'
+TEMP=$(getopt -o 'ksu:p:qh' --long 'kerberos,sesame,user:,passfile:,quiet,help' -n "$me" -- "$@") || {
+  error 1 "Erreur de syntaxe."
+}
+eval set -- "$TEMP"
+unset TEMP
+
+unset kerberos sesame quiet keytab
+user="$USER"
+passfile=-
+while true; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit
+      ;;
+    -k|--kerberos)
+      kerberos=1
+      ;;
+    -t|--keytab)
+      keytab="$2"
+      shift
+      ;;
+    -s|--sesame)
+      sesame=1
+      ;;
+    -u|--user)
+      user="$2"
+      shift
+      ;;
+    -p|--passfile)
+      passfile="$2"
+      shift
+      ;;
+    -q|--quiet)
+      quiet=1
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      error 1 "Erreur de syntaxe."
+      ;;
+  esac
+  shift
+done
+
+# Check des options
+if [ "$kerberos$sesame" = 11 ]; then
+  error 1 "Les options '-k' et '-s' sont mutuellement exclusives"
+fi
+if [ -z "$kerberos$sesame" ]; then
+  error 1 "Il faut spécifier le mode d'authentification avec l'une des options '-k' ou '-s'"
+fi
+
+# Main
+if [ -n "$kerberos" ]; then
+  do_kerberos
+else
+  do_sesame
+fi
+ret_code=$?
+if [ $ret_code = 0 ]; then
+  for var in HTTPS_PROXY HTTP_PROXY FTP_PROXY https_proxy http_proxy ftp_proxy; do
+    export_vars "$var=http://$proxy"
+  done
+  export_vars no_proxy=localhost,127.0.0.1,.edf.fr,.edf.com
+else
+  error $ret_code "Échec d'authentification"
+fi
