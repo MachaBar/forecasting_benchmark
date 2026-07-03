@@ -1,9 +1,9 @@
-"""Train PatchTST with the SAME temporal split (70/15/15) training only sees train clients
-and train positions; validation uses val cutoffs on val clients.
+"""Train PatchTST with the SAME temporal split (70/15/15): training only sees
+train clients and train positions; validation uses val cutoffs on val clients.
 
 Run from the repo root:
-    python -m scripts.train_patchtst
-    python -m scripts.train_patchtst dataset=cer_bis train.max_steps=100000
+    python -m scripts.train.train_patchtst
+    python -m scripts.train.train_patchtst dataset=cer_bis train.max_steps=100000
 """
 from __future__ import annotations
 
@@ -13,13 +13,14 @@ from pathlib import Path
 
 import hydra
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
-import pandas as pd
+from torch.utils.tensorboard import SummaryWriter
 
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+sys.path.append(str(Path(__file__).resolve().parents[2]))   # <-- repo root (scripts/train/ -> ../../)
 from src.dataset.dataset import (
     TrainWindowDataset,
     client_ids_to_indices,
@@ -29,7 +30,6 @@ from src.dataset.dataset import (
     make_cutoffs,
 )
 from src.models.patchtst.patch_tst import PatchTST
-from torch.utils.tensorboard import SummaryWriter
 
 
 def build_model(cfg: DictConfig) -> PatchTST:
@@ -59,14 +59,7 @@ def build_model(cfg: DictConfig) -> PatchTST:
     )
 
 
-def _val_loss(
-    model: PatchTST,
-    ts,
-    cutoffs: np.ndarray,
-    cfg: DictConfig,
-    device: torch.device,
-    val_indices: list[int],
-) -> float:
+def _val_loss(model, ts, cutoffs, cfg, device, val_indices) -> float:
     """MSE on the val cutoffs, restricted to the VAL clients."""
     model.eval()
     criterion = nn.MSELoss()
@@ -84,6 +77,7 @@ def _val_loss(
             total += criterion(y_pred, batch["y"]).item()
     model.train()
     return total / max(len(cutoffs), 1)
+
 
 def _val_metrics(model, ts, cutoffs, cfg, device, val_indices, season_length):
     """Full metric bundle on val cutoffs / val clients (mean over clients+cutoffs)."""
@@ -113,11 +107,10 @@ def _val_metrics(model, ts, cutoffs, cfg, device, val_indices, season_length):
                 )
                 all_rows.append(m.to_dict())
     model.train()
-    df = pd.DataFrame(all_rows)
-    return df.mean(numeric_only=True).to_dict()
+    return pd.DataFrame(all_rows).mean(numeric_only=True).to_dict()
 
 
-@hydra.main(config_path="../configs", config_name="config_patchtst", version_base=None)
+@hydra.main(config_path="../../configs", config_name="config_patchtst", version_base=None)  # <-- ../../configs
 def main(cfg: DictConfig) -> None:
     data_path = hydra.utils.to_absolute_path(cfg.dataset.path)
     split_path = hydra.utils.to_absolute_path(cfg.dataset.path_client_split)
@@ -152,7 +145,7 @@ def main(cfg: DictConfig) -> None:
         horizon=cfg.dataset.prediction_length,
         train_positions=cutoffs["train_positions"],
         n_samples=cfg.n_samples,
-        client_pool=train_indices,   # <- excludes val AND test clients
+        client_pool=train_indices,   # excludes val AND test clients
         seed=cfg.seed,
     )
     loader = DataLoader(train_ds, batch_size=cfg.train.batch_size, num_workers=4, pin_memory=True)
@@ -163,19 +156,16 @@ def main(cfg: DictConfig) -> None:
     criterion = nn.MSELoss()
 
     output_dir = Path(hydra.utils.to_absolute_path(cfg.output_dir))
-
     tb_dir = output_dir / "tensorboard"
     writer = SummaryWriter(log_dir=str(tb_dir))
     print(f"TensorBoard logs → {tb_dir}")
 
-    # Historiques sauvegardés aussi en CSV (indépendant de TensorBoard)
     train_history: list[dict] = []
     val_history: list[dict] = []
 
     ckpt_dir = output_dir / "checkpoints"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
-    # Save training info (same spirit as eval_info.json)
     train_info = {
         "dataset": cfg.dataset.name,
         "context_length": cfg.dataset.context_length,
@@ -193,12 +183,26 @@ def main(cfg: DictConfig) -> None:
     with open(output_dir / "train_info.json", "w") as f:
         json.dump(train_info, f, indent=2)
 
-        step = 0
+    # ---- Training loop (step-based) ----
+    step = 0
     best_val = float("inf")
-    patience = cfg.train.get("early_stopping_patience", 10)  # nb de validations sans amélioration
+    best_step = -1
+    patience = cfg.train.get("early_stopping_patience", 10)
     min_delta = cfg.train.get("early_stopping_min_delta", 1e-5)
     bad_vals = 0
     stop_training = False
+
+    def _save(path, extra=None):
+        payload = {
+            "step": step,
+            "model": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+            "best_val": best_val,
+            "best_step": best_step,
+        }
+        if extra:
+            payload.update(extra)
+        torch.save(payload, path)
 
     model.train()
     while step < cfg.train.max_steps and not stop_training:
@@ -206,8 +210,8 @@ def main(cfg: DictConfig) -> None:
             if step >= cfg.train.max_steps:
                 break
 
-            x = batch["x"].to(device)
-            y = batch["y"].to(device)
+            x = batch["x"].to(device)   # (B, 1, ctx)
+            y = batch["y"].to(device)   # (B, 1, horizon)
 
             optimizer.zero_grad()
             loss = criterion(model(x), y)
@@ -226,8 +230,11 @@ def main(cfg: DictConfig) -> None:
                 val_history.append({"step": step, "loss_mse": val})
                 if val < best_val - min_delta:
                     best_val = val
+                    best_step = step
                     bad_vals = 0
-                    torch.save(model.state_dict(), ckpt_dir / "best_model.pth")
+                    _save(ckpt_dir / "best_model.pth")
+                    with open(ckpt_dir / "best_info.json", "w") as fp:
+                        json.dump({"best_step": best_step, "best_val": best_val}, fp, indent=2)
                     print(f"step={step:>7d}  val_loss={val:.6f}  ✓ new best")
                 else:
                     bad_vals += 1
@@ -238,7 +245,7 @@ def main(cfg: DictConfig) -> None:
                         break
 
             if step % cfg.train.save_every == 0 and step > 0:
-                torch.save(model.state_dict(), ckpt_dir / f"step_{step:07d}.pth")
+                _save(ckpt_dir / f"step_{step:07d}.pth")
 
             if step % cfg.train.get("metrics_every", 10000) == 0 and step > 0:
                 vm = _val_metrics(model, ts, cutoffs["val_cutoffs"], cfg, device,
@@ -249,9 +256,14 @@ def main(cfg: DictConfig) -> None:
                 print(f"step={step:>7d}  val_mase={vm.get('mase', float('nan')):.4f}")
 
             step += 1
-        writer.close()
+
+    # ---- 
+    _save(ckpt_dir / "last_model.pth")
+    writer.close()
     pd.DataFrame(train_history).to_csv(output_dir / "history_train.csv", index=False)
     pd.DataFrame(val_history).to_csv(output_dir / "history_val.csv", index=False)
+    print(f"Done. Best val loss: {best_val:.6f} @ step {best_step}")
+    print(f"Best checkpoint: {ckpt_dir / 'best_model.pth'}")
 
 
 if __name__ == "__main__":

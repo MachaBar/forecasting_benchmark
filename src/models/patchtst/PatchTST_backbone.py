@@ -121,31 +121,29 @@ class PatchTST_backbone(nn.Module):
             self.head = Flatten_Head(self.individual, self.n_vars, self.head_nf, target_window, head_dropout=head_dropout)
         
     
-    def forward(self, z):                                                                   # z: [bs x nvars x seq_len] 
-        if self.revin: 
+    def forward(self, z):                                                                   # z: [bs x nvars x seq_len]
+        if self.revin:
             z = z.permute(0,2,1)
-            print("z before revin: ",z.mean())
+            _mean_before = z.mean().item()
             z = self.revin_layer(z, 'norm')
-            print("z after revin: ",z.mean())
+            _mean_after = z.mean().item()
+            if not getattr(self, "_revin_checked", False):
+                print(f"[RevIN] normalization active — mean {_mean_before:.4f} → {_mean_after:.4f} (should be ≈0)")
+                self._revin_checked = True
             z = z.permute(0,2,1)
 
         # do patching
         if self.padding_patch == 'end':
-            print("z before padding layer : ",z.shape)
             z = self.padding_patch_layer(z)
-            print("z after padding layer : ",z.shape)
-        print("z shape : ",z.shape)
-        print("patch len : ",self.patch_len)
-        print("stride : ",self.stride)
         z = z.unfold(dimension=-1, size=self.patch_len, step=self.stride)                   # z: [bs x nvars x patch_num x patch_len]
         z = z.permute(0,1,3,2)                                                              # z: [bs x nvars x patch_len x patch_num]
-        
+
         # model
         z = self.backbone(z)                                                                # z: [bs x nvars x d_model x patch_num]
-        z = self.head(z)                                                                    # z: [bs x nvars x target_window] 
+        z = self.head(z)                                                                    # z: [bs x nvars x target_window]
 
         # denorm
-        if self.revin: 
+        if self.revin:
             z = z.permute(0,2,1)
             z = self.revin_layer(z, 'denorm')
             z = z.permute(0,2,1)
