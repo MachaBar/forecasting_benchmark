@@ -19,4 +19,4 @@ python -m scripts.eval.eval_patchtst \
     dataset=cer_bis \
     dataset.context_length=512 \
     dataset.prediction_length=96 \
-    eval.run_dir=outputs/patchtst/cer/ctx512_h96/2026-07-02_15-00-00
+    eval.run_dir=outputs/patchtst/cer_bis/ctx512_h96/2026-07-03_16-00-06

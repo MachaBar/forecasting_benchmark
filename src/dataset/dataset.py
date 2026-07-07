@@ -50,9 +50,17 @@ class TimeSeriesFrame:
             object.__setattr__(self, "_values_cache", cache)
         return cache
 
+    # @property
+    # def datetimes(self) -> list[Any]:
+    #     return list(self.frame.index)
+
     @property
     def datetimes(self) -> list[Any]:
-        return list(self.frame.index)
+        cache = getattr(self, "_datetimes_cache", None)
+        if cache is None:
+            cache = list(self.frame.index)
+            object.__setattr__(self, "_datetimes_cache", cache)
+        return cache
 
     @property
     def user_names(self) -> list[str]:

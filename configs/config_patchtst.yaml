@@ -18,5 +18,5 @@ hydra:
     subdir: ctx${dataset.context_length}_h${dataset.prediction_length}
 
 eval:
-  run_dir: ???            # obligatoire : chemin du dossier de training à évaluer
+  run_dir: /home/d32485/forecasting_benchmark/outputs/patchtst/cer_bis/ctx512_h96/2026-07-03_16-00-06            # chemin du dossier de training à évaluer
   checkpoint: best_model.pth

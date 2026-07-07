@@ -59,3 +59,30 @@ class PatchTST(nn.Module):
 
     def forward(self, x, c=None):
         return self.model(x)
+    
+
+import torch
+from torch import nn
+from .PatchTST_backbone import PatchTST_backbone
+
+
+class QuantilePatchTST(nn.Module):
+    """PatchTST with a multi-quantile head: predicts Q values per timestep.
+
+    Output shape: (B, 1, H, Q) in RAW space (RevIN denorm being affine and
+    monotone, denormalized quantiles remain valid quantiles).
+    """
+
+    def __init__(self, quantile_levels, target_window, **kwargs):
+        super().__init__()
+        self.quantile_levels = list(quantile_levels)
+        self.n_q = len(self.quantile_levels)
+        self.target_window = target_window
+        # The backbone's head is a Linear(nf, target_window): asking for
+        # target_window * n_q outputs gives one value per (timestep, quantile).
+        self.model = PatchTST_backbone(target_window=target_window * self.n_q, **kwargs)
+
+    def forward(self, x, c=None):                    # x: (B, 1, ctx)
+        z = self.model(x)                            # (B, 1, H*Q), already denormalized
+        B = z.shape[0]
+        return z.reshape(B, 1, self.target_window, self.n_q)   # (B, 1, H, Q)

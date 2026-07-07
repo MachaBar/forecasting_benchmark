@@ -32,6 +32,7 @@ from src.dataset.dataset import (
 from src.models.patchtst.patch_tst import PatchTST
 
 
+
 def build_model(cfg: DictConfig) -> PatchTST:
     m = cfg.model
     return PatchTST(
@@ -125,6 +126,23 @@ def collate_drop_none(batch):
         else:
             out[k] = default_collate(vals)
     return out
+
+
+class PinballLoss(nn.Module):
+    """Mean pinball (quantile) loss over all quantile levels.
+
+    y_pred: (B, 1, H, Q)   y_true: (B, 1, H)
+    """
+    def __init__(self, quantile_levels):
+        super().__init__()
+        self.register_buffer(
+            "q", torch.tensor(quantile_levels, dtype=torch.float32)  # (Q,)
+        )
+
+    def forward(self, y_pred, y_true):
+        diff = y_true.unsqueeze(-1) - y_pred            # (B, 1, H, Q)
+        loss = torch.maximum(self.q * diff, (self.q - 1.0) * diff)
+        return loss.mean()
 
 @hydra.main(config_path="../../configs", config_name="config_patchtst", version_base=None)  # <-- ../../configs
 def main(cfg: DictConfig) -> None:
