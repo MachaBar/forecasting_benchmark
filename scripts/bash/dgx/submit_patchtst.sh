@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=64G
-#SBATCH --job-name=tsfm
+#SBATCH --job-name=tr
 #SBATCH -o ./jobs/%j.out
 #SBATCH -e ./jobs/%j.err
 
@@ -17,6 +17,7 @@ source .venv/bin/activate
 
 python -m scripts.eval.eval_patchtst \
     dataset=cer_bis \
+    model.probabilistic=true \
     dataset.context_length=512 \
     dataset.prediction_length=96 \
-    eval.run_dir=outputs/patchtst/cer_bis/ctx512_h96/2026-07-03_16-00-06
+    eval.run_dir=outputs/patchtst/cer_bis/ctx512_h96/2026-07-07_18-17-08

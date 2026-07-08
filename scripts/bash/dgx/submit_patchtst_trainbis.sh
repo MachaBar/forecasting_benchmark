@@ -17,6 +17,7 @@ source .venv/bin/activate
 
 python -m scripts.train.train_patchtst \
     dataset=cer_bis \
+    model.probabilistic=true \
     train.max_steps=200000 \
     dataset.context_length=512 \
     dataset.prediction_length=96 \
