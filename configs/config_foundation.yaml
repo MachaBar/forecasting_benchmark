@@ -1,0 +1,12 @@
+defaults:
+  - dataset: cer_bis
+  - model: tsicl     #chronos | tsicl | <nouveau>
+  - _self_
+
+output_dir: "."
+hydra:
+  run:
+    dir: outputs/${model.name}/${dataset.name}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/${model.name}/${dataset.name}/multirun
+    subdir: ctx${dataset.context_length}_h${dataset.prediction_length}
