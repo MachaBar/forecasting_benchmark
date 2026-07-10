@@ -44,6 +44,24 @@ def _series_dict(ts, indices, start, end):
     }
 
 
+def _extract_quantiles(pred_q, uid, quantile_levels, H):
+    """Robustly pull the (H, Q) quantile matrix for one client from
+    skforecast's long output, whatever the exact quantile column names."""
+    sub = pred_q[pred_q["level"] == uid]
+    cols = [c for c in sub.columns if c not in ("level",)]
+    qpreds = {}
+    for q in quantile_levels:
+        # try common naming conventions in order
+        candidates = [f"q_{q}", str(q), f"quantile_{q}", f"{q:.2f}", f"q_{q:.2f}"]
+        col = next((c for c in candidates if c in sub.columns), None)
+        if col is None:
+            raise KeyError(
+                f"quantile {q} not found. Available columns: {sub.columns.tolist()}"
+            )
+        qpreds[q] = sub[col].to_numpy()[:H]
+    return qpreds
+
+
 @hydra.main(config_path="../../configs", config_name="config_lgbm", version_base=None)
 def main(cfg: DictConfig) -> None:
     from hydra.core.hydra_config import HydraConfig
@@ -92,19 +110,37 @@ def main(cfg: DictConfig) -> None:
     forecaster = ForecasterRecursiveMultiSeries(
         lgbm,
         lags=list(cfg.model.lags),
-        # encoding="ordinal",   # client id as a categorical feature
-        encoding=None,  
+        encoding=None,           # truly global model → generalizes to unseen clients
     )
 
     train_series = _series_dict(ts, train_indices, 0, train_end)
     t0 = time.perf_counter()
-    forecaster.fit(series=train_series)
+    # forecaster.fit(series=train_series)
+    forecaster.fit(series=train_series, store_in_sample_residuals=True) 
     fit_time = time.perf_counter() - t0
     print(f"Fitted global LGBM on {len(train_series)} train clients in {fit_time:.1f}s")
 
-    # if is_prob:
-    #     # residuals needed for bootstrapped quantiles
-    #     forecaster.set_out_sample_residuals(series=train_series)
+    # ---- Probabilistic: pool per-level residuals into '_unknown_level' ----
+    # skforecast keys residuals by training client; unseen test clients fall
+    # back to the '_unknown_level' bucket, which is not auto-populated. Since
+    # the model is global (encoding=None) all clients share one error signature,
+    # so we pool every training client's residuals into that bucket.
+    if is_prob:
+        res = forecaster.in_sample_residuals_
+        print(f"[debug] residual keys: {list(res.keys())}, "
+              f"non-None: {[k for k, v in res.items() if v is not None]}")
+
+        # Si _unknown_level est déjà rempli, rien à faire.
+        if res.get("_unknown_level") is None:
+            arrays = [v for k, v in res.items() if v is not None and k != "_unknown_level"]
+            if not arrays:
+                raise RuntimeError(
+                    "No in-sample residuals available. Ensure fit(..., "
+                    "store_in_sample_residuals=True) was called."
+                )
+            forecaster.in_sample_residuals_["_unknown_level"] = np.concatenate(arrays)
+        print(f"'_unknown_level' residuals: "
+              f"{len(forecaster.in_sample_residuals_['_unknown_level'])}")
 
     # ---- Save eval_info ----
     eval_info = {
@@ -124,7 +160,6 @@ def main(cfg: DictConfig) -> None:
 
     for ci, cutoff in enumerate(cutoffs):
         print(f"cutoff {ci+1}/{len(cutoffs)}  idx={cutoff} ...")
-        # last_window = the context window for test clients at this cutoff
         last_window = _series_dict(ts, test_indices, cutoff, cutoff + ctx_len)
         last_window_df = pd.DataFrame(last_window)
 
@@ -132,17 +167,20 @@ def main(cfg: DictConfig) -> None:
 
         t_inf = time.perf_counter()
         if is_prob:
-            # skforecast returns long df with quantile columns
             pred_q = forecaster.predict_quantiles(
                 steps=H, quantiles=quantile_levels,
                 last_window=last_window_df, n_boot=cfg.model.get("n_boot", 100),
-                use_in_sample_residuals=True,   
-                use_binned_residuals=False,  
+                use_in_sample_residuals=True,
+                use_binned_residuals=False,
             )
             point = forecaster.predict(steps=H, last_window=last_window_df)
         else:
             point = forecaster.predict(steps=H, last_window=last_window_df)
         total_infer += time.perf_counter() - t_inf
+
+        # one-time debug of column names on the first probabilistic cutoff
+        if is_prob and ci == 0:
+            print(f"[debug] pred_q columns: {pred_q.columns.tolist()}")
 
         cutoff_rows = []
         for i, uid in enumerate(batch["item_ids"]):
@@ -150,13 +188,11 @@ def main(cfg: DictConfig) -> None:
             ctx = batch["x"][i, 0].numpy()
             hist = ts.values[: cutoff + ctx_len, test_indices[i]]
 
-            # point: long df with a column per level ('level') and 'pred'
             y_pred = point.loc[point["level"] == uid, "pred"].to_numpy()[:H]
 
             qpreds = None
             if is_prob:
-                sub = pred_q[pred_q["level"] == uid]
-                qpreds = {q: sub[f"q_{q}"].to_numpy()[:H] for q in quantile_levels}
+                qpreds = _extract_quantiles(pred_q, uid, quantile_levels, H)
 
             m = compute_metrics(y_true, y_pred, context=ctx, history=hist,
                                 season_length=season_length,
@@ -180,7 +216,7 @@ def main(cfg: DictConfig) -> None:
     summary = results.groupby("model")[metric_cols].mean().sort_values("mase")
     print(summary)
 
-    # ---- Timing (aligné sur le foundation runner) ----
+    # ---- Timing ----
     n_forecasts = len(test_indices) * len(cutoffs)
     timing = {
         "fit_time_s": round(fit_time, 2),
@@ -189,11 +225,17 @@ def main(cfg: DictConfig) -> None:
     }
     print(f"Timing: fit={timing['fit_time_s']}s  infer={timing['total_infer_s']}s  "
           f"({timing['per_forecast_ms']} ms/forecast)")
+
+    eval_info["timing"] = timing
+    with open(output_dir / "eval_info.json", "w") as f:
+        json.dump(eval_info, f, indent=2)
+
     summary_row = summary.copy()
     summary_row["context_length"] = ctx_len
     summary_row["prediction_length"] = H
-    summary_row["fit_time_s"] = round(fit_time, 2)
-    summary_row["infer_time_s"] = round(total_infer, 2)
+    summary_row["fit_time_s"] = timing["fit_time_s"]
+    summary_row["total_infer_s"] = timing["total_infer_s"]
+    summary_row["per_forecast_ms"] = timing["per_forecast_ms"]
     summary_row["run_date"] = run_date
     summary_row = summary_row.reset_index()
     summary_row.to_csv(output_dir / "summary_by_model.csv", index=False)
