@@ -189,31 +189,41 @@ def run_foundation_eval(cfg, adapter: ForecastAdapter, output_dir: Path,
     with open(output_dir / "eval_info.json", "w") as f:
         json.dump(eval_info, f, indent=2)
 
-    # ---- Final CSVs + summary ----
+    # ---- Final per-client CSVs ----
     run_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     results = pd.DataFrame(rows)
     results.to_csv(output_dir / "results_per_client_cutoff.csv", index=False)
     results.to_csv(output_dir / f"results_per_client_cutoff_{run_date}.csv", index=False)
 
+    # ---- Enriched summary row (metrics + config + timing) ----
     metric_cols = [c for c in results.columns
                    if c not in ("unique_id", "cutoff", "model", "context_length", "prediction_length")]
     summary = results.groupby("model")[metric_cols].mean().sort_values("mase")
     print("\n=== Mean over all TEST clients and evaluation windows ===")
     print(summary)
-    summary.to_csv(output_dir / "summary_by_model.csv")
 
-    # ---- Accumulated summary across runs (with timing columns) ----
     summary_row = summary.copy()
     summary_row["context_length"] = ctx_len
     summary_row["prediction_length"] = H
+    summary_row["stride"] = cfg.dataset.stride
+    summary_row["batch_size"] = batch_size
+    summary_row["probabilistic"] = bool(is_prob)
+    summary_row["model_load_s"] = timing["model_load_s"]
     summary_row["total_eval_s"] = timing["total_eval_s"]
+    summary_row["pure_inference_s"] = timing["pure_inference_s"]
     summary_row["per_forecast_ms"] = timing["per_forecast_ms"]
     summary_row["run_date"] = run_date
     summary_row = summary_row.reset_index()
+
+    # 1. per-run summary — WITH ctx/horizon/timing columns
+    summary_row.to_csv(output_dir / "summary_by_model.csv", index=False)
+
+    # 2. accumulated across all runs (progressive: one row appended per run)
     summary_all_path = output_dir.parent / "summary_all_runs.csv"
+    acc = summary_row
     if summary_all_path.exists():
-        summary_row = pd.concat([pd.read_csv(summary_all_path), summary_row], ignore_index=True)
-    summary_row.to_csv(summary_all_path, index=False)
+        acc = pd.concat([pd.read_csv(summary_all_path), summary_row], ignore_index=True)
+    acc.to_csv(summary_all_path, index=False)
     print(f"Summary all runs → {summary_all_path}")
 
     return results

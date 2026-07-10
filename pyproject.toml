@@ -24,6 +24,7 @@ dependencies = [
     "pyarrow>=20.0.0",
     "rotary-embedding-torch==0.8.6",
     "seaborn>=0.13.2",
+    "skforecast>=0.23.0",
     "statsforecast>=2.0.3",
     "statsmodels>=0.14.5",
     "tensorboard>=2.19.0",

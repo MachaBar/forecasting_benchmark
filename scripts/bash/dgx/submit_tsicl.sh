@@ -18,5 +18,6 @@ source .venv/bin/activate
 
 srun python -u -m src.baselines.run_foundation --multirun \
     model=tsicl dataset=cer_bis model.probabilistic=true \
-    dataset.context_length=336,512,672 \
-    dataset.prediction_length=48,96,192
+    model.weights_path=/home/d32485/forecasting_benchmark/checkpoints/tsicl-v1.ckpt \
+    dataset.context_length=512,336,672,1008 \
+    dataset.prediction_length=96,48,336,672 
