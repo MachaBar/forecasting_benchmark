@@ -28,6 +28,7 @@ dependencies = [
     "statsforecast>=2.0.3",
     "statsmodels>=0.14.5",
     "tensorboard>=2.19.0",
+    "tirex-2>=0.1.1",
     "torch>=2.4.1",
     "tsicl>=0.2.0",
     "xformers>=0.0.28.post1",

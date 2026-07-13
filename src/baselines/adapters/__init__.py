@@ -1,9 +1,11 @@
 from .chronos_adapter import ChronosAdapter
 from .tsicl_adapter import TSICLAdapter
+from .tirex_adapter import TiRexAdapter
 
 ADAPTERS = {
     "chronos2": ChronosAdapter,
     "tsicl": TSICLAdapter,
+    "tirex2": TiRexAdapter,
 }
 
 def get_adapter(cfg):
