@@ -49,6 +49,7 @@ datasets/
 *.npz
 *.pkl
 *.csv
+*.png
 
 # OS files
 .DS_Store
