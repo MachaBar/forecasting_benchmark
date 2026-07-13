@@ -158,6 +158,67 @@ def crps_from_samples(y_true: np.ndarray, samples: np.ndarray) -> float:
     return term1 - 0.5 * term2
 
 
+def _kmeans_1d(x: np.ndarray, seeds, n_iter: int = 10):
+    """1-D k-means (k=3) seeded by given centroids, min-Euclidean assignment."""
+    c = np.asarray(seeds, dtype=float)
+    for _ in range(n_iter):
+        assign = np.abs(x[:, None] - c[None, :]).argmin(axis=1)
+        newc = c.copy()
+        for k in range(len(c)):
+            if np.any(assign == k):
+                newc[k] = x[assign == k].mean()
+        if np.allclose(newc, c):
+            break
+        c = newc
+    return assign, c
+
+
+def empq(y_true: np.ndarray, y_pred: np.ndarray, *, eps: float = 1e-3) -> dict[str, float]:
+    """EMPQ (Manandhar et al., Energies 2024, 17, 6131) — Algorithm 1 + Table 3.
+
+    - cluster populations: k=3 k-means on the RAW differences, seeded by
+      (mindiff, avgdiff, maxdiff)  [Algorithm 1]
+    - min/max deviation: Q1/Q3 of the percentage deviation from actual  [Table 3]
+    """
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    diff = y_pred - y_true                        # >0 over, <0 under
+    denom = np.maximum(np.abs(y_true), eps)
+    pdev = diff / denom * 100.0                   # signed % deviation from actual
+    n = len(diff)
+    out: dict[str, float] = {}
+
+    for sign, tag in ((1, "over"), (-1, "under")):
+        mask = diff > 0 if sign == 1 else diff < 0
+        grp = diff[mask]                           # raw diffs → clustering
+        grp_pct = pdev[mask]                       # % deviations → min/max reporting
+
+        out[f"empq_{tag}_pct"] = float(mask.sum() / n * 100) if n else float("nan")
+
+        if len(grp_pct) >= 1:
+            out[f"empq_{tag}_mindev_pct"] = float(np.percentile(grp_pct, 25))  # Q1
+            out[f"empq_{tag}_maxdev_pct"] = float(np.percentile(grp_pct, 75))  # Q3
+        else:
+            out[f"empq_{tag}_mindev_pct"] = float("nan")
+            out[f"empq_{tag}_maxdev_pct"] = float("nan")
+
+        if len(grp) >= 3:
+            assign, cent = _kmeans_1d(grp, seeds=[grp.min(), grp.mean(), grp.max()])
+            order = np.argsort(np.abs(cent))       # near = smallest |bias|
+            remap = np.empty(len(cent), dtype=int)
+            remap[order] = np.arange(len(cent))
+            lab = remap[assign]
+            out[f"empq_{tag}_near_pct"]  = float((lab == 0).mean() * 100)
+            out[f"empq_{tag}_inter_pct"] = float((lab == 1).mean() * 100)
+            out[f"empq_{tag}_well_pct"]  = float((lab == 2).mean() * 100)
+        else:
+            out[f"empq_{tag}_near_pct"]  = float("nan")
+            out[f"empq_{tag}_inter_pct"] = float("nan")
+            out[f"empq_{tag}_well_pct"]  = float("nan")
+
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # Convenience bundle
 # --------------------------------------------------------------------------- #
@@ -174,9 +235,14 @@ class MetricBundle:
     mase: float | None = None
     wql: float | None = None
     crps: float | None = None
+    empq: dict[str, float] | None = None
 
     def to_dict(self) -> dict[str, float | None]:
-        return asdict(self)
+        d = asdict(self)
+        empq_dict = d.pop("empq")                  
+        if empq_dict:
+            d.update(empq_dict)
+        return d
 
 
 def compute_metrics(
@@ -187,6 +253,7 @@ def compute_metrics(
     history: np.ndarray | None = None,
     season_length: int | None = None,
     include_mape: bool = False,
+    include_empq=True,
     quantile_preds: dict[float, np.ndarray] | None = None,
     samples: np.ndarray | None = None,
 ) -> MetricBundle:
@@ -203,6 +270,9 @@ def compute_metrics(
 
     if include_mape:
         bundle.mape = mape(y_true, y_pred)
+
+    if include_empq:
+        bundle.empq = empq(y_true, y_pred)
 
     if history is not None and season_length is not None:
         bundle.mase = mase(y_true, y_pred, history, season_length)

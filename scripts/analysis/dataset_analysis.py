@@ -16,7 +16,7 @@ from src.dataset.dataset import load_dataset
 
 # ---- CONFIG: edit these ----
 DATASET_NAME = "cer_bis"
-DATA_PATH    = "/home/d32485/forecasting_benchmark/data/cer/cer/load_curve.parquet"
+DATA_PATH    = "/home/d32485/forecasting_benchmark/data/cer_bis/load_curve.parquet"
 TIMESTAMP_COL = "time"
 LAYOUT = "wide"
 FREQ_MINUTES = 30           # 30-min steps
@@ -198,7 +198,7 @@ fig.savefig(out_dir / "07_full_timeline.png", dpi=150)
 plt.close(fig)
 
 # %%
-print(f"\n Analysis complete. All CSVs + figures saved to: {out_dir}")
+print(f"\nAnalysis complete. All CSVs + figures saved to: {out_dir}")
 print("Files:")
 for f in sorted(out_dir.iterdir()):
     print(" ", f.name)

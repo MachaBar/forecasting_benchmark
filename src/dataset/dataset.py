@@ -156,10 +156,20 @@ def _read_raw_frame(
 
     if ext == ".parquet":
         raw = pd.read_parquet(path)
+
         if date_col:
-            raw = raw.set_index(date_col)
-        else:
-            raw.index = pd.to_datetime(raw.index)
+            if date_col in raw.columns:
+                raw = raw.set_index(date_col)
+            elif raw.index.name == date_col:
+                # déjà le bon index
+                pass
+            else:
+                raise KeyError(
+                    f"{date_col} absent.\n"
+                    f"columns={raw.columns.tolist()[:10]}\n"
+                    f"index={raw.index.name}"
+                )
+
         return raw
 
     if ext == ".npy":

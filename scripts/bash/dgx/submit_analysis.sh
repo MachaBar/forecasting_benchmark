@@ -14,4 +14,5 @@ set -euo pipefail
 mkdir -p jobs
 source .venv/bin/activate
 
-uv run python scripts/analysis/dataset_analysis.py
+# uv run python scripts/analysis/dataset_analysis.py
+uv run python scripts/analysis/compare_datasets.py
