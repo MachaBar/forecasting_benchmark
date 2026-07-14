@@ -15,7 +15,13 @@ mkdir -p jobs
 source .venv/bin/activate
 
 export HF_HUB_OFFLINE=1
-srun python -u -m src.baselines.run_foundation \
+# srun python -u -m src.baselines.run_foundation \
+#     model=tirex dataset=cer_bis model.probabilistic=true \
+#     dataset.context_length=512 dataset.prediction_length=96 \
+#     model.weights_path=/home/d32485/forecasting_benchmark/checkpoints/tirex2
+
+srun python -u -m src.baselines.run_foundation --multirun \
     model=tirex dataset=cer_bis model.probabilistic=true \
-    dataset.context_length=512 dataset.prediction_length=96 \
-    model.weights_path=/home/d32485/forecasting_benchmark/checkpoints/tirex2
+    model.weights_path=/home/d32485/forecasting_benchmark/checkpoints/tirex2 \
+    dataset.context_length=144,336,672,1440 \
+    dataset.prediction_length=96

@@ -8,15 +8,23 @@ class ChronosAdapter(ForecastAdapter):
 
     def load(self):
         try:
-            from chronos import Chronos2Pipeline
+            from chronos.chronos2 import Chronos2Pipeline
         except ImportError:
             from chronos import ChronosPipeline as Chronos2Pipeline
-        self.pipe = Chronos2Pipeline.from_pretrained(
-            self.cfg.weights_path,
-            device_map=self.cfg.device_map,
-            dtype=getattr(torch, self.cfg.torch_dtype),
-            local_files_only=True,
-        )
+
+        dtype = getattr(torch, self.cfg.torch_dtype)
+        base_kwargs = dict(device_map=self.cfg.device_map, local_files_only=True)
+        # API changed across versions: dtype kwarg name differs / may be unsupported
+        for extra in ({"dtype": dtype}, {"torch_dtype": dtype}, {}):
+            try:
+                self.pipe = Chronos2Pipeline.from_pretrained(
+                    self.cfg.weights_path, **base_kwargs, **extra
+                )
+                return
+            except TypeError:
+                continue
+        # last resort: no device_map either
+        self.pipe = Chronos2Pipeline.from_pretrained(self.cfg.weights_path)
 
     def predict(self, contexts, prediction_length, quantile_levels):
         ctx = [torch.tensor(contexts[i]) for i in range(contexts.shape[0])]

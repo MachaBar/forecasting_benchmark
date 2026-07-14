@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --wckey=p11mh:python
-#SBATCH --partition=h100-bis
+#SBATCH --partition=h100
 #SBATCH --time=7-00:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
@@ -19,5 +19,5 @@ python -m scripts.train.train_patchtst \
     dataset=cer_bis \
     model.probabilistic=true \
     train.max_steps=200000 \
-    dataset.context_length=512 \
+    dataset.context_length=1440 \
     dataset.prediction_length=96 \

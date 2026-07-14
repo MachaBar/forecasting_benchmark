@@ -20,8 +20,14 @@ source .venv/bin/activate
 # CER — with probabilistic metrics (WQL/CRPS)
 # srun python3 -m scripts.run_chronos dataset=cer model.probabilistic=true
 
-srun python3 -m src.baselines.run_chronos --multirun \
-    dataset=cer_bis \
-    model.probabilistic=true \
-    dataset.context_length=512,336,672,1008 \
-    dataset.prediction_length=96,48,336,672
+# srun python3 -m src.baselines.run_chronos --multirun \
+#     dataset=cer_bis \
+#     model.probabilistic=true \
+#     dataset.context_length=512,336,672,1008 \
+#     dataset.prediction_length=96,48,336,672
+
+srun python -u -m src.baselines.run_foundation --multirun \
+    model=chronos dataset=cer_bis model.probabilistic=true \
+    model.weights_path=/home/d32485/timetensor/src/timetensor/sota/chronos2/weights \
+    dataset.context_length=144,336,672,1440 \
+    dataset.prediction_length=96
