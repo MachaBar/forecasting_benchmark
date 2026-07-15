@@ -25,21 +25,41 @@ import numpy as np
 # --------------------------------------------------------------------------- #
 # Point metrics
 # --------------------------------------------------------------------------- #
+# def _maybe_normalize(
+#     y_true: np.ndarray,
+#     y_pred: np.ndarray,
+#     context: np.ndarray | None,
+#     eps: float = 1e-3,
+# ) -> tuple[np.ndarray, np.ndarray]:
+#     """If `context` is given, rescales y_true/y_pred by the context's own
+#     mean/std (instance normalization) before the metric is computed — the
+#     statistics come ONLY from the context, never from y_true, to avoid
+#     leakage. Returns the inputs unchanged if context is None."""
+#     if context is None:
+#         return y_true, y_pred
+#     context = np.asarray(context, dtype=float)
+#     mean = context.mean()
+#     scale = max(float(context.std()), eps)
+#     return (y_true - mean) / scale, (y_pred - mean) / scale
+
 def _maybe_normalize(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     context: np.ndarray | None,
-    eps: float = 1e-3,
+    eps: float = 1e-8,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """If `context` is given, rescales y_true/y_pred by the context's own
-    mean/std (instance normalization) before the metric is computed — the
-    statistics come ONLY from the context, never from y_true, to avoid
-    leakage. Returns the inputs unchanged if context is None."""
+    """Instance-normalization by the context std (→ NMAE / NRMSE when the
+    caller then takes MAE / RMSE). If the context is (near-)constant, the
+    normalization is undefined — we return NaN so that window is *excluded*
+    from the average rather than exploding via an artificial floor."""
     if context is None:
         return y_true, y_pred
     context = np.asarray(context, dtype=float)
+    scale = float(context.std())
+    if scale < eps:                                    # constant context → undefined
+        nan = np.full(np.shape(y_true), np.nan, dtype=float)
+        return nan, nan
     mean = context.mean()
-    scale = max(float(context.std()), eps)
     return (y_true - mean) / scale, (y_pred - mean) / scale
 
 
@@ -173,38 +193,42 @@ def _kmeans_1d(x: np.ndarray, seeds, n_iter: int = 10):
     return assign, c
 
 
-def empq(y_true: np.ndarray, y_pred: np.ndarray, *, eps: float = 1e-3) -> dict[str, float]:
-    """EMPQ (Manandhar et al., Energies 2024, 17, 6131) — Algorithm 1 + Table 3.
-
-    - cluster populations: k=3 k-means on the RAW differences, seeded by
-      (mindiff, avgdiff, maxdiff)  [Algorithm 1]
-    - min/max deviation: Q1/Q3 of the percentage deviation from actual  [Table 3]
-    """
+def empq(y_true: np.ndarray, y_pred: np.ndarray, *, zero_frac: float = 0.01) -> dict[str, float]:
+    """EMPQ (Manandhar et al., Energies 2024). Cluster populations use raw
+    differences; min/max deviation % are Q1/Q3 of the per-point % deviation
+    from actual — but points where the actual is (near-)zero are excluded
+    from that percentile, since '% from actual' is undefined there."""
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
-    diff = y_pred - y_true                        # >0 over, <0 under
-    denom = np.maximum(np.abs(y_true), eps)
-    pdev = diff / denom * 100.0                   # signed % deviation from actual
+    diff = y_pred - y_true                          # >0 over, <0 under
     n = len(diff)
+
+    # threshold below which "% from actual" is meaningless (relative to window level)
+    level = float(np.mean(np.abs(y_true)))
+    zero_thr = zero_frac * level                    # e.g. 1% of the window's mean level
     out: dict[str, float] = {}
 
     for sign, tag in ((1, "over"), (-1, "under")):
         mask = diff > 0 if sign == 1 else diff < 0
-        grp = diff[mask]                           # raw diffs → clustering
-        grp_pct = pdev[mask]                       # % deviations → min/max reporting
+        grp = diff[mask]                            # raw diffs → clustering (all points)
+        grp_true = y_true[mask]
 
         out[f"empq_{tag}_pct"] = float(mask.sum() / n * 100) if n else float("nan")
 
-        if len(grp_pct) >= 1:
-            out[f"empq_{tag}_mindev_pct"] = float(np.percentile(grp_pct, 25))  # Q1
-            out[f"empq_{tag}_maxdev_pct"] = float(np.percentile(grp_pct, 75))  # Q3
+        # min/max deviation % — ONLY on points whose actual is not near zero
+        valid = np.abs(grp_true) >= zero_thr
+        if valid.sum() >= 1:
+            pdev = grp[valid] / grp_true[valid] * 100.0
+            out[f"empq_{tag}_mindev_pct"] = float(np.percentile(pdev, 25))  # Q1
+            out[f"empq_{tag}_maxdev_pct"] = float(np.percentile(pdev, 75))  # Q3
         else:
             out[f"empq_{tag}_mindev_pct"] = float("nan")
             out[f"empq_{tag}_maxdev_pct"] = float("nan")
 
+        # cluster populations — on ALL raw differences (unchanged, always defined)
         if len(grp) >= 3:
             assign, cent = _kmeans_1d(grp, seeds=[grp.min(), grp.mean(), grp.max()])
-            order = np.argsort(np.abs(cent))       # near = smallest |bias|
+            order = np.argsort(np.abs(cent))
             remap = np.empty(len(cent), dtype=int)
             remap[order] = np.arange(len(cent))
             lab = remap[assign]

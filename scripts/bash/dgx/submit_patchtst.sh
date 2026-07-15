@@ -18,6 +18,6 @@ source .venv/bin/activate
 python -m scripts.eval.eval_patchtst \
     dataset=cer_bis \
     model.probabilistic=true \
-    dataset.context_length=512 \
+    dataset.context_length=1440 \
     dataset.prediction_length=96 \
-    eval.run_dir=outputs/patchtst/cer_bis/ctx512_h96/2026-07-07_18-17-08
+    eval.run_dir=outputs/patchtst/cer_bis/ctx1440_h96/2026-07-14_09-48-14

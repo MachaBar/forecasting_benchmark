@@ -94,9 +94,18 @@ def main(cfg: DictConfig) -> None:
     r_train = float(cfg.dataset.get("ratios", "0.7,0.15,0.15").split(",")[0])
     train_end = int(round(r_train * ts.n_dates))
 
+    # Keep only lags that fit within the context window
+    all_lags = list(cfg.model.lags)
+    lags = [l for l in all_lags if l <= ctx_len]
+    if len(lags) < len(all_lags):
+        dropped = [l for l in all_lags if l > ctx_len]
+        print(f"[warn] dropping lags {dropped} > context_length={ctx_len}; using {lags}")
+    if not lags:
+        raise ValueError(f"no usable lag ≤ context_length={ctx_len}")
+
     print(f"Clients  : {len(train_indices)} train / {len(test_indices)} test")
     print(f"Windows  : {len(cutoffs)} test cutoffs")
-    print(f"Context  : {ctx_len} | Horizon: {H} | lags={list(cfg.model.lags)}")
+    print(f"Context  : {ctx_len} | Horizon: {H} | lags={lags}")
 
     # ---- Build + fit the global forecaster (once, on train clients/period) ----
     lgbm = LGBMRegressor(
@@ -107,9 +116,10 @@ def main(cfg: DictConfig) -> None:
         n_jobs=cfg.model.get("n_jobs", -1),
         verbose=-1,
     )
+    
     forecaster = ForecasterRecursiveMultiSeries(
         lgbm,
-        lags=list(cfg.model.lags),
+        lags=lags,
         encoding=None,           # truly global model → generalizes to unseen clients
     )
 
@@ -148,7 +158,7 @@ def main(cfg: DictConfig) -> None:
         "n_train_clients": len(train_indices), "n_test_clients": len(test_indices),
         "n_cutoffs": len(cutoffs), "cutoffs": cutoffs,
         "context_length": ctx_len, "prediction_length": H,
-        "lags": list(cfg.model.lags), "probabilistic": bool(is_prob),
+        "lags": lags, "probabilistic": bool(is_prob),
         "quantile_levels": quantile_levels, "fit_time_s": round(fit_time, 2),
     }
     with open(output_dir / "eval_info.json", "w") as f:

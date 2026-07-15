@@ -16,6 +16,6 @@ source .venv/bin/activate
 
 srun python -u -m src.baselines.run_lgbm \
     dataset=cer_bis \
-    dataset.context_length=512 \
+    dataset.context_length=1440 \
     dataset.prediction_length=96 \
     model.probabilistic=true

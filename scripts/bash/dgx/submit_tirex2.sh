@@ -24,4 +24,4 @@ srun python -u -m src.baselines.run_foundation --multirun \
     model=tirex dataset=cer_bis model.probabilistic=true \
     model.weights_path=/home/d32485/forecasting_benchmark/checkpoints/tirex2 \
     dataset.context_length=144,336,672,1440 \
-    dataset.prediction_length=96
+    dataset.prediction_length=336

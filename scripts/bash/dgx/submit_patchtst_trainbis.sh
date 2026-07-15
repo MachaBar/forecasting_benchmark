@@ -19,5 +19,5 @@ python -m scripts.train.train_patchtst \
     dataset=cer_bis \
     model.probabilistic=true \
     train.max_steps=200000 \
-    dataset.context_length=1440 \
-    dataset.prediction_length=96 \
+    dataset.context_length=144 \
+    dataset.prediction_length=336 \
