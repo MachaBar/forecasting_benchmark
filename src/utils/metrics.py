@@ -177,6 +177,30 @@ def crps_from_samples(y_true: np.ndarray, samples: np.ndarray) -> float:
     term2 = float(np.mean(np.abs(samples[:, None, ...] - samples[None, :, ...])))
     return term1 - 0.5 * term2
 
+def sql(
+    y_true: np.ndarray,
+    quantile_preds: dict[float, np.ndarray],
+    history: np.ndarray,
+    season_length: int,
+) -> float:
+    """Scaled Quantile Loss — the probabilistic analogue of MASE (SQL, as
+    used e.g. in [cite the paper]). Normalizes the quantile (pinball) loss
+    by the series' own in-sample seasonal-naive error, exactly like MASE
+    does for point forecasts — scale-free PER SERIES, unlike WQL which
+    normalizes by the batch's total |y|.
+    """
+    y_true = np.asarray(y_true, dtype=float)
+    history = np.asarray(history, dtype=float)
+    if len(history) <= season_length or not quantile_preds:
+        return float("nan")
+    naive_errors = np.abs(history[season_length:] - history[:-season_length])
+    a = max(float(naive_errors.mean()), 1e-8)          # a_{n,d}, comme dans MASE
+
+    per_quantile = [
+        float(np.mean(pinball_loss(y_true, y_pred_q, q)))   # pinball_loss a déjà le facteur implicite
+        for q, y_pred_q in quantile_preds.items()
+    ]
+    return float(np.mean(per_quantile)) / a 
 
 def _kmeans_1d(x: np.ndarray, seeds, n_iter: int = 10):
     """1-D k-means (k=3) seeded by given centroids, min-Euclidean assignment."""
@@ -193,39 +217,38 @@ def _kmeans_1d(x: np.ndarray, seeds, n_iter: int = 10):
     return assign, c
 
 
-def empq(y_true: np.ndarray, y_pred: np.ndarray, *, zero_frac: float = 0.01) -> dict[str, float]:
-    """EMPQ (Manandhar et al., Energies 2024). Cluster populations use raw
-    differences; min/max deviation % are Q1/Q3 of the per-point % deviation
-    from actual — but points where the actual is (near-)zero are excluded
-    from that percentile, since '% from actual' is undefined there."""
+def empq(y_true: np.ndarray, y_pred: np.ndarray, *, zero_frac: float = 0.01, eps: float = 1e-6) -> dict[str, float]:
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
-    diff = y_pred - y_true                          # >0 over, <0 under
+    diff = y_pred - y_true
     n = len(diff)
 
-    # threshold below which "% from actual" is meaningless (relative to window level)
     level = float(np.mean(np.abs(y_true)))
-    zero_thr = zero_frac * level                    # e.g. 1% of the window's mean level
+    zero_thr = max(zero_frac * level, eps)          # ← plancher absolu ajouté
     out: dict[str, float] = {}
 
     for sign, tag in ((1, "over"), (-1, "under")):
         mask = diff > 0 if sign == 1 else diff < 0
-        grp = diff[mask]                            # raw diffs → clustering (all points)
+        grp = diff[mask]
         grp_true = y_true[mask]
 
         out[f"empq_{tag}_pct"] = float(mask.sum() / n * 100) if n else float("nan")
 
-        # min/max deviation % — ONLY on points whose actual is not near zero
-        valid = np.abs(grp_true) >= zero_thr
+        valid = np.abs(grp_true) >= zero_thr            # maintenant jamais 0
         if valid.sum() >= 1:
-            pdev = grp[valid] / grp_true[valid] * 100.0
-            out[f"empq_{tag}_mindev_pct"] = float(np.percentile(pdev, 25))  # Q1
-            out[f"empq_{tag}_maxdev_pct"] = float(np.percentile(pdev, 75))  # Q3
+            with np.errstate(divide="ignore", invalid="ignore"):
+                pdev = grp[valid] / grp_true[valid] * 100.0
+            pdev = pdev[np.isfinite(pdev)]               # filet de sécurité supplémentaire
+            if len(pdev) >= 1:
+                out[f"empq_{tag}_mindev_pct"] = float(np.percentile(pdev, 25))
+                out[f"empq_{tag}_maxdev_pct"] = float(np.percentile(pdev, 75))
+            else:
+                out[f"empq_{tag}_mindev_pct"] = float("nan")
+                out[f"empq_{tag}_maxdev_pct"] = float("nan")
         else:
             out[f"empq_{tag}_mindev_pct"] = float("nan")
             out[f"empq_{tag}_maxdev_pct"] = float("nan")
 
-        # cluster populations — on ALL raw differences (unchanged, always defined)
         if len(grp) >= 3:
             assign, cent = _kmeans_1d(grp, seeds=[grp.min(), grp.mean(), grp.max()])
             order = np.argsort(np.abs(cent))
@@ -258,6 +281,7 @@ class MetricBundle:
     mape: float | None = None
     mase: float | None = None
     wql: float | None = None
+    sql: float | None = None
     crps: float | None = None
     empq: dict[str, float] | None = None
 
@@ -304,6 +328,8 @@ def compute_metrics(
     if quantile_preds:
         bundle.wql = wql(y_true, quantile_preds)
         bundle.crps = crps_from_quantiles(y_true, quantile_preds)
+        if history is not None and season_length is not None:
+            bundle.sql = sql(y_true, quantile_preds, history, season_length)
     elif samples is not None:
         bundle.crps = crps_from_samples(y_true, samples)
 

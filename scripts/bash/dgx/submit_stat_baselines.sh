@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --wckey=p11mh:python
-#SBATCH --partition=h100
+#SBATCH --partition=a100
 #SBATCH --time=6-00:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
@@ -26,7 +26,8 @@ REPO=/home/d32485/forecasting_benchmark
 srun python3 -m src.baselines.run_statistical_baselines \
   dataset=cer_bis \
   model.probabilistic=true \
-  model.max_lookback=512 
+  model.max_lookback=1440 \
+  dataset.prediction_length=96
 
 # # SMACH — saison horaire
 # srun python3 -m src.baselines.run_statistical_baselines \
