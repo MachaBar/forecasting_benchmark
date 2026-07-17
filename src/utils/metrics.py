@@ -197,7 +197,7 @@ def sql(
     a = max(float(naive_errors.mean()), 1e-8)          # a_{n,d}, comme dans MASE
 
     per_quantile = [
-        float(np.mean(pinball_loss(y_true, y_pred_q, q)))   # pinball_loss a déjà le facteur implicite
+        2.0 * float(np.mean(pinball_loss(y_true, y_pred_q, q)))
         for q, y_pred_q in quantile_preds.items()
     ]
     return float(np.mean(per_quantile)) / a 

@@ -1,0 +1,26 @@
+# @package _global_.model
+name: "prophet"
+
+# --- Trend ---
+changepoint_prior_scale: 0.05     # ← main tuning knob (0.01–0.5)
+changepoint_range: 0.8
+
+# --- Seasonality ---
+seasonality_prior_scale: 10.0     # ← second tuning knob (5–15)
+seasonality_mode: "additive"      # or "multiplicative"
+daily_seasonality: true           # 48-step daily cycle
+weekly_seasonality: true
+yearly_seasonality: false         # enable only if history > ~2 years
+
+# --- Probabilistic ---
+probabilistic: false
+quantile_levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+uncertainty_samples: 200
+interval_width: 0.8
+
+# --- History ---
+max_lookback: null                # null = all available history
+
+season_length: 48
+include_mape: false
+include_empq: true
