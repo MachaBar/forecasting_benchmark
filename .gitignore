@@ -55,4 +55,6 @@ datasets/
 .DS_Store
 Thumbs.db
 
-tirex-2
+tirex-2/
+checkpoints/
+chronos-2-finetuned/

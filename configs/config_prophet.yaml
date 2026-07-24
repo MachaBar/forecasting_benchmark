@@ -10,5 +10,5 @@ hydra:
   sweep:
     dir: outputs/prophet/${dataset.name}/multirun_${now:%Y-%m-%d_%H-%M-%S}
     subdir: ctx${dataset.context_length}_h${dataset.prediction_length}
-tune_n_clients: null
-eval_split: "test"
+
+eval_split: "test"  

@@ -78,10 +78,19 @@ def main(cfg: DictConfig) -> None:
     train_indices = client_ids_to_indices(ts, split["train"])
     test_indices = client_ids_to_indices(ts, split["test"])
 
+    # splits = make_cutoffs(
+    #     ts, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length,
+    #     step_size=cfg.dataset.stride, ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    # )
     splits = make_cutoffs(
-        ts, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length,
-        step_size=cfg.dataset.stride, ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
-    )
+    ts, lags=ctx_len, horizon=H,
+    step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    cutoff_mode=cfg.dataset.get("cutoff_mode", "fixed"),
+    gap_min=cfg.dataset.get("cutoff_gap_min", 24),
+    gap_max=cfg.dataset.get("cutoff_gap_max", 96),
+    seed=cfg.dataset.get("cutoff_seed", 42),
+)
     cutoffs = splits["test_cutoffs"].tolist()
     ctx_len = cfg.dataset.context_length
     H = cfg.dataset.prediction_length

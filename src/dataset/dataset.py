@@ -334,6 +334,93 @@ def _rolling_cutoffs_in_range(
     return np.array([start + i * step_size for i in range(n_windows)])
 
 
+# def make_cutoffs(
+#     ts: TimeSeriesFrame,
+#     *,
+#     lags: int,
+#     horizon: int,
+#     n_val_windows: int = 6,
+#     n_test_windows: int = 6,
+#     step_size: int | None = None,
+#     ratios: str | Sequence[float] | None = None,
+# ) -> dict[str, Any]:
+#     """Computes the valid training positions + the val/test cutoffs.
+
+#     Two modes, your choice:
+#       - ratios=None (default): n_val_windows/n_test_windows fixed windows
+#         counted backward from the end of the series — the val+test size is
+#         absolute, independent of the total series length;
+#       - ratios="0.7,0.15,0.15" (or [0.7, 0.15, 0.15]): train/val/test
+#         boundaries as a % of ts.n_dates (GIFT-Eval style), with as many
+#         rolling windows as fit inside each val/test block.
+
+#     In both cases, the val/test cutoffs are fixed and identical for every
+#     model being compared (stats, ML, DL, TSFM), and a margin of `horizon`
+#     separates the last valid training position from the first validation
+#     cutoff so that no train target overlaps with val.
+#     """
+#     step_size = step_size or horizon
+
+#     if ratios is not None:
+#         r_train, r_val, _ = parse_ratios(ratios)
+#         train_end = int(round(r_train * ts.n_dates))
+#         val_end = int(round((r_train + r_val) * ts.n_dates))
+#         test_end = ts.n_dates
+
+#         val_cutoffs = _rolling_cutoffs_in_range(
+#             train_end, val_end, lags=lags, horizon=horizon, step_size=step_size
+#         )
+#         test_cutoffs = _rolling_cutoffs_in_range(
+#             val_end, test_end, lags=lags, horizon=horizon, step_size=step_size
+#         )
+#     else:
+#         last_cutoff = ts.n_dates - lags - horizon  # last valid "start" position
+#         test_cutoffs = np.array(
+#             [last_cutoff - i * step_size for i in range(n_test_windows)][::-1]
+#         )
+#         first_test = int(test_cutoffs[0])
+#         val_cutoffs = np.array(
+#             [first_test - step_size - i * step_size for i in range(n_val_windows)][::-1]
+#         )
+
+#     first_val = int(val_cutoffs[0])
+#     train_upper_bound = first_val - horizon  # train target must end before the val target
+#     train_positions = np.arange(lags, train_upper_bound)
+
+#     if train_positions.size == 0:
+#         raise ValueError(
+#             "not enough data to generate valid training positions with these "
+#             "parameters (lags/horizon/ratios/n_val_windows/n_test_windows "
+#             "are incompatible with the length of the series)"
+#         )
+
+#     return {
+#         "train_positions": train_positions,  # for random sampling during training
+#         "val_cutoffs": val_cutoffs,           # fixed, same for every model
+#         "test_cutoffs": test_cutoffs,         # fixed, same for every model
+#     }
+
+
+def _random_cutoffs_in_range(
+    start: int, end: int, *, horizon: int, gap_min: int, gap_max: int, seed: int
+) -> np.ndarray:
+    """Cutoffs (context start positions) spaced by a random gap drawn from
+    [gap_min, gap_max], with a FIXED seed — so the sequence is identical
+    across every run/model (reproducible), while breaking the fixed-hour
+    bias of a constant stride. Generated using horizon only (not lags): a
+    given cutoff is valid for context length `lags` iff
+    cutoff + lags + horizon <= end — callers with smaller lags therefore
+    keep MORE of this same sequence than callers with larger lags (same
+    nesting behavior as the fixed-stride mode)."""
+    rng = np.random.default_rng(seed)
+    limit = end - horizon  # loosest bound (assumes lags=0); filtered per-caller by lags
+    cutoffs = []
+    pos = start
+    while pos <= limit:
+        cutoffs.append(pos)
+        pos += int(rng.integers(gap_min, gap_max + 1))
+    return np.array(cutoffs, dtype=int)
+
 def make_cutoffs(
     ts: TimeSeriesFrame,
     *,
@@ -343,22 +430,11 @@ def make_cutoffs(
     n_test_windows: int = 6,
     step_size: int | None = None,
     ratios: str | Sequence[float] | None = None,
+    cutoff_mode: str = "fixed",          # "fixed" | "random"
+    gap_min: int = 24,
+    gap_max: int = 96,
+    seed: int = 42,
 ) -> dict[str, Any]:
-    """Computes the valid training positions + the val/test cutoffs.
-
-    Two modes, your choice:
-      - ratios=None (default): n_val_windows/n_test_windows fixed windows
-        counted backward from the end of the series — the val+test size is
-        absolute, independent of the total series length;
-      - ratios="0.7,0.15,0.15" (or [0.7, 0.15, 0.15]): train/val/test
-        boundaries as a % of ts.n_dates (GIFT-Eval style), with as many
-        rolling windows as fit inside each val/test block.
-
-    In both cases, the val/test cutoffs are fixed and identical for every
-    model being compared (stats, ML, DL, TSFM), and a margin of `horizon`
-    separates the last valid training position from the first validation
-    cutoff so that no train target overlaps with val.
-    """
     step_size = step_size or horizon
 
     if ratios is not None:
@@ -367,14 +443,30 @@ def make_cutoffs(
         val_end = int(round((r_train + r_val) * ts.n_dates))
         test_end = ts.n_dates
 
-        val_cutoffs = _rolling_cutoffs_in_range(
-            train_end, val_end, lags=lags, horizon=horizon, step_size=step_size
-        )
-        test_cutoffs = _rolling_cutoffs_in_range(
-            val_end, test_end, lags=lags, horizon=horizon, step_size=step_size
-        )
+        if cutoff_mode == "random":
+            val_positions = _random_cutoffs_in_range(
+                train_end, val_end, horizon=horizon,
+                gap_min=gap_min, gap_max=gap_max, seed=seed,
+            )
+            test_positions = _random_cutoffs_in_range(
+                val_end, test_end, horizon=horizon,
+                gap_min=gap_min, gap_max=gap_max, seed=seed,
+            )
+        else:
+            val_positions = _rolling_cutoffs_in_range(
+                train_end, val_end, lags=lags, horizon=horizon, step_size=step_size
+            )
+            test_positions = _rolling_cutoffs_in_range(
+                val_end, test_end, lags=lags, horizon=horizon, step_size=step_size
+            )
+
+        # filter by the ACTUAL context length (lags) — same nesting behavior
+        # as fixed mode: smaller lags keep more of the tail cutoffs.
+        val_cutoffs = val_positions[val_positions + lags + horizon <= val_end]
+        test_cutoffs = test_positions[test_positions + lags + horizon <= test_end]
     else:
-        last_cutoff = ts.n_dates - lags - horizon  # last valid "start" position
+        # (unchanged legacy n_val_windows/n_test_windows path)
+        last_cutoff = ts.n_dates - lags - horizon
         test_cutoffs = np.array(
             [last_cutoff - i * step_size for i in range(n_test_windows)][::-1]
         )
@@ -383,8 +475,14 @@ def make_cutoffs(
             [first_test - step_size - i * step_size for i in range(n_val_windows)][::-1]
         )
 
+    if len(val_cutoffs) == 0 or len(test_cutoffs) == 0:
+        raise ValueError(
+            f"no valid cutoffs for lags={lags}, horizon={horizon} "
+            f"(context too large for the val/test block)"
+        )
+
     first_val = int(val_cutoffs[0])
-    train_upper_bound = first_val - horizon  # train target must end before the val target
+    train_upper_bound = first_val - horizon
     train_positions = np.arange(lags, train_upper_bound)
 
     if train_positions.size == 0:
@@ -395,11 +493,10 @@ def make_cutoffs(
         )
 
     return {
-        "train_positions": train_positions,  # for random sampling during training
-        "val_cutoffs": val_cutoffs,           # fixed, same for every model
-        "test_cutoffs": test_cutoffs,         # fixed, same for every model
+        "train_positions": train_positions,
+        "val_cutoffs": val_cutoffs,
+        "test_cutoffs": test_cutoffs,
     }
-
 
 # --------------------------------------------------------------------------- #
 # 3bis. Additional split by CLIENT (in addition to the temporal split)

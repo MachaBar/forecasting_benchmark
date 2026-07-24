@@ -35,8 +35,7 @@ def _cuda_sync():
 def _save_forecast_plot(*, context, y_true, quantiles, quantile_levels, uid,
                         cutoff, output_dir, context_length, prediction_length,
                         model_name="foundation", n_context_shown=None):
-    """quantiles: (H, Q). Timeline starts at 0 at the beginning of the shown
-    context; forecast begins at n_ctx. One file per ctx/horizon size."""
+    """quantiles: (H, Q). """
     q_idx = {q: j for j, q in enumerate(quantile_levels)}
     median = quantiles[:, q_idx[0.5]]
     q10 = quantiles[:, q_idx.get(0.1, 0)]
@@ -72,10 +71,22 @@ def run_foundation_eval(cfg, adapter: ForecastAdapter, output_dir: Path,
     split = load_client_split_pickle(split_path)
     test_indices = client_ids_to_indices(ts, split["test"])
 
+    # splits = make_cutoffs(
+    #     ts, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length,
+    #     step_size=cfg.dataset.stride, ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    # )
+    ctx_len = cfg.dataset.context_length
+    H = cfg.dataset.prediction_length
+
     splits = make_cutoffs(
-        ts, lags=cfg.dataset.context_length, horizon=cfg.dataset.prediction_length,
-        step_size=cfg.dataset.stride, ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
-    )
+    ts, lags=ctx_len, horizon=H,
+    step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    cutoff_mode=cfg.dataset.get("cutoff_mode", "fixed"),
+    gap_min=cfg.dataset.get("cutoff_gap_min", 24),
+    gap_max=cfg.dataset.get("cutoff_gap_max", 96),
+    seed=cfg.dataset.get("cutoff_seed", 42),
+)
     cutoffs = splits["test_cutoffs"].tolist()
 
     is_prob = cfg.model.get("probabilistic", False)
@@ -83,8 +94,8 @@ def run_foundation_eval(cfg, adapter: ForecastAdapter, output_dir: Path,
         (list(cfg.model.get("quantile_levels", [])) if is_prob else [])))
     batch_size = cfg.model.get("batch_size", 32)
     season_length = cfg.model.get("season_length", cfg.dataset.get("season_length", 48))
-    ctx_len = cfg.dataset.context_length
-    H = cfg.dataset.prediction_length
+    # ctx_len = cfg.dataset.context_length
+    # H = cfg.dataset.prediction_length
 
     # ---- Load model (timed) ----
     t0 = time.perf_counter()

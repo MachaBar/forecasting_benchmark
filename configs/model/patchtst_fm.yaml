@@ -1,0 +1,37 @@
+# @package _global_.model
+name: "patchtst_fm"
+
+# HuggingFace model — accepts a HF repo id OR a local path to downloaded weights.
+# Variants:
+#   Research: "ibm-research/patchtst-fm-r1"
+#   Granite : "ibm-granite/granite-timeseries-patchtst-fm-r1"
+# Local (downloaded manually into checkpoints/):
+#   "checkpoints/weights/patchtst_fm/PatchTST-FM-r1"
+#   "checkpoints/weights/patchtst_fm/Granite-PatchTST-FM-r1"
+model_name: "checkpoints/weights/patchtst_fm/PatchTST-FM-r1"
+device: "cuda"
+
+# Model context and prediction
+max_context_length: 8192  # model maximum (can reduce for memory)
+context_length: 4096     # will be overridden by dataset.context_length
+prediction_length: 96    # will be overridden by dataset.prediction_length
+
+# Batch size for inference
+batch_size: 32
+
+# Imputation: None for auto-imputation, "forward_fill", "linear", etc.
+impute_method: null
+
+# Quantile levels: subset of pretraining quantiles [0.01, 0.02, ..., 0.99]
+quantile_levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+# Season length for metrics
+season_length: 48
+
+include_mape: false
+
+# Fine-tuning parameters (if implemented)
+finetune_mode: "lora"
+num_steps: 500
+learning_rate: 1.0e-5
+use_validation: true

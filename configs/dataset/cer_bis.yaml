@@ -4,8 +4,14 @@ path_client_split: /home/d32485/forecasting_benchmark/data/cer_bis/train_valid_t
 timestamp_col: "time"
 layout: "wide"
 
-context_length: 512
-prediction_length: 96
+context_length: 1440
+prediction_length: 336
 stride: 96
 
 name: "cer_bis"
+ratios: "0.7,0.15,0.15"
+
+cutoff_mode: "random"    # "fixed" (défaut historique) ou "random"
+cutoff_gap_min: 24       # 12h à 30-min steps
+cutoff_gap_max: 96       # 48h
+cutoff_seed: 42

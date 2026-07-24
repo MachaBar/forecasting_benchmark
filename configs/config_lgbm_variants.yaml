@@ -1,0 +1,13 @@
+defaults:
+  - dataset: cer_bis
+  - model: lgbm_variants
+  - _self_
+
+seed: 42
+output_dir: "."
+hydra:
+  run:
+    dir: outputs/lgbm_variants/${dataset.name}/${model.variant}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/lgbm_variants/${dataset.name}/multirun_${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${model.variant}_ctx${dataset.context_length}_h${dataset.prediction_length}

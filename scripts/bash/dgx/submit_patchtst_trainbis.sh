@@ -23,8 +23,8 @@ source .venv/bin/activate
 #     dataset.prediction_length=96 \
 
 
-for ctx in 336 672 144; do
+for ctx in 672 144; do
   srun python -u -m scripts.train.train_patchtst \
-      dataset=cer dataset.context_length=$ctx dataset.prediction_length=96 \
+      dataset=cer_bis dataset.context_length=$ctx dataset.prediction_length=96 \
       eval.run_dir=outputs/patchtst/cer/multirun/ctx${ctx}_h96
 done

@@ -103,11 +103,20 @@ def main(cfg: DictConfig) -> None:
     ctx_len = cfg.dataset.context_length
     H = cfg.dataset.prediction_length
 
+    # splits = make_cutoffs(
+    #     ts, lags=ctx_len, horizon=H,
+    #     step_size=cfg.dataset.stride,
+    #     ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    # )
     splits = make_cutoffs(
-        ts, lags=ctx_len, horizon=H,
-        step_size=cfg.dataset.stride,
-        ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
-    )
+    ts, lags=ctx_len, horizon=H,
+    step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    cutoff_mode=cfg.dataset.get("cutoff_mode", "fixed"),
+    gap_min=cfg.dataset.get("cutoff_gap_min", 24),
+    gap_max=cfg.dataset.get("cutoff_gap_max", 96),
+    seed=cfg.dataset.get("cutoff_seed", 42),
+)
     cutoffs = splits["test_cutoffs"].tolist()
 
     print(f"\n=== Evaluation scope ===")

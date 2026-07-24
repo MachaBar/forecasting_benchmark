@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 # le summary du grid-search val (adapte le chemin daté)
-path = sorted(Path("outputs/prophet/cer_bis").glob("multirun_*/summary_all_runs.csv"))[-1]
+path = sorted(Path("outputs/prophet/cer_bis").glob("multirun_2026-07-17_13-11-20/summary_all_runs.csv"))[-1]
 df = pd.read_csv(path)
 df = df[df["eval_split"] == "val"]
 

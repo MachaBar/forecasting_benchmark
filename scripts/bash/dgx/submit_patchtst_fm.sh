@@ -14,17 +14,6 @@ set -euo pipefail
 mkdir -p jobs
 source .venv/bin/activate
 
-# CER — point metrics only
-# srun python3 -m scripts.run_chronos dataset=cer
-
-# CER — with probabilistic metrics (WQL/CRPS)
-# srun python3 -m scripts.run_chronos dataset=cer model.probabilistic=true
-
-# srun python3 -m src.baselines.run_chronos --multirun \
-#     dataset=cer_bis \
-#     model.probabilistic=true \
-#     dataset.context_length=512,336,672,1008 \
-#     dataset.prediction_length=96,48,336,672
 
 srun python -u -m src.baselines.run_foundation --multirun \
     model=chronos dataset=cer_bis model.probabilistic=true \

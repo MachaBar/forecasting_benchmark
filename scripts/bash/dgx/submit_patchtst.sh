@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --wckey=p11mh:python
-#SBATCH --partition=h100-bis
+#SBATCH --partition=h100
 #SBATCH --time=6-00:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1

@@ -18,3 +18,19 @@ quantile_levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 season_length: 48
 
 include_mape: false
+# --- Fine-tuning ---
+# finetune_mode: "lora"       # "full" | "lora"
+# num_steps: 500
+# learning_rate: 1.0e-5       # 1e-5 for LoRA, 1e-6 for full
+# logging_steps: 100
+# Fine-tuning
+finetune_mode: "full"          # ← "full" au lieu de "lora"
+num_steps: 200                 # ← plus conservatif (full = plus risqué d'overfit)
+learning_rate: 1.0e-6          # ← beaucoup plus bas (1e-6 pour full, 1e-5 pour lora)
+logging_steps: 50
+
+use_validation: true
+
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05

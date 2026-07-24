@@ -39,6 +39,9 @@ def _fit_predict_one(prophet_kwargs, ds_hist, y_hist, ds_future,
     """Fit Prophet on one client's history and forecast the future timestamps.
     Returns (point (H,), quantile_dict or None)."""
     from prophet import Prophet
+    ds_hist = pd.DatetimeIndex(ds_hist).tz_localize(None)
+    ds_future = pd.DatetimeIndex(ds_future).tz_localize(None)
+
     m = Prophet(**prophet_kwargs)
     m.fit(pd.DataFrame({"ds": ds_hist, "y": y_hist}))
     future = pd.DataFrame({"ds": ds_future})
@@ -77,11 +80,20 @@ def main(cfg: DictConfig) -> None:
     quantile_levels = sorted(set([0.1, 0.5, 0.9] +
         (list(cfg.model.get("quantile_levels", [])) if is_prob else [])))
 
+    # splits = make_cutoffs(
+    #     ts, lags=ctx_len, horizon=H,
+    #     step_size=cfg.dataset.stride,
+    #     ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    # )
     splits = make_cutoffs(
-        ts, lags=ctx_len, horizon=H,
-        step_size=cfg.dataset.stride,
-        ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
-    )
+    ts, lags=ctx_len, horizon=H,
+    step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    cutoff_mode=cfg.dataset.get("cutoff_mode", "fixed"),
+    gap_min=cfg.dataset.get("cutoff_gap_min", 24),
+    gap_max=cfg.dataset.get("cutoff_gap_max", 96),
+    seed=cfg.dataset.get("cutoff_seed", 42),
+)
     # cutoffs = splits["test_cutoffs"].tolist()
 
         # ---- Tuning support: evaluate on val cutoffs + subsample clients ----

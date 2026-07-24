@@ -1,0 +1,9 @@
+defaults:
+  - dataset: cer_bis
+  - model: chronos
+  - _self_
+
+output_dir: "."
+hydra:
+  run:
+    dir: outputs/chronos2_finetuned/${dataset.name}/${model.finetune_mode}/${now:%Y-%m-%d_%H-%M-%S}
