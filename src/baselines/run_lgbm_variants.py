@@ -27,7 +27,7 @@ import pandas as pd
 from omegaconf import DictConfig
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
-from src.baselines.lgbm_core import build_training_table, fit_global, fit_per_hour, predict_recursive
+from src.baselines.run_lgbm_core import build_training_table, fit_global, fit_per_hour, predict_recursive
 from src.dataset.dataset import (
     client_ids_to_indices, eval_batch, load_client_split_pickle,
     load_dataset, make_cutoffs,
@@ -67,10 +67,18 @@ def main(cfg: DictConfig) -> None:
     r_train = float(cfg.dataset.get("ratios", "0.7,0.15,0.15").split(",")[0])
     train_end = int(round(r_train * ts.n_dates))
 
+    # splits = make_cutoffs(
+    #     ts, lags=ctx_len, horizon=H, step_size=cfg.dataset.stride,
+    #     ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    # )
     splits = make_cutoffs(
-        ts, lags=ctx_len, horizon=H, step_size=cfg.dataset.stride,
-        ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
-    )
+    ts, lags=ctx_len, horizon=H, step_size=cfg.dataset.stride,
+    ratios=cfg.dataset.get("ratios", "0.7,0.15,0.15"),
+    cutoff_mode=cfg.dataset.get("cutoff_mode", "fixed"),
+    gap_min=cfg.dataset.get("cutoff_gap_min", 24),
+    gap_max=cfg.dataset.get("cutoff_gap_max", 96),
+    seed=cfg.dataset.get("cutoff_seed", 42),
+)
     cutoffs = splits["test_cutoffs"].tolist()
     if len(cutoffs) < cfg.dataset.get("min_cutoffs", 3):
         print(f"SKIP: only {len(cutoffs)} cutoffs for ctx={ctx_len}, h={H}.")

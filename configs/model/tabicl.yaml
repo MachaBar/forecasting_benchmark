@@ -1,0 +1,14 @@
+# @package _global_.model
+name: "tabicl"
+
+# TabICLForecaster params
+max_context_length: 4096
+point_estimate: "mean"   # "mean" or "median"
+
+# Quantiles used for probabilistic metrics (WQL/SQL/CRPS)
+probabilistic: true
+quantile_levels: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+batch_size: 32
+season_length: 48
+include_mape: false

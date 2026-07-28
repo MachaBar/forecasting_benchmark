@@ -24,6 +24,7 @@ outputs_smach/
 ICLR26/
 generation/
 TimePoint/
+granite-tsfm-main/
 
 # WandB
 wandb/
@@ -50,6 +51,7 @@ datasets/
 *.pkl
 *.csv
 *.png
+*.zip
 
 # OS files
 .DS_Store

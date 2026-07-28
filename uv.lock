@@ -161,6 +161,65 @@ wheels = [
 ]
 
 [[package]]
+name = "backports-zstd"
+version = "1.6.0"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0.tar.gz", hash = "sha256:80a7859ffe70bf239d7a2ce15293bdeb5b4280ff7dc326ffab312b0e254dbb24" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:0466b14723f3b7697669c00ee66fe16e30e25636b286b0a923fa86fa3d8a753c" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1d146926e997d2d3de8212bdcbf4985344a2622ca3bec458d8908000a84fd883" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux2010_i686.manylinux_2_12_i686.manylinux_2_28_i686.whl", hash = "sha256:460fd6b3f338c659507ae36cfd6b58ac9942a2ff233c5cf574416dfec0451a84" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7c2b1f4a640c51130caa92cef5bf72bd3c3dbbcfbf814c37403aa0601b1811b0" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:beb43e9885202c8d4f3762319ed4d5e98e197622afbff8439fbbdd81d08938b9" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:fbb746522ebfc11155f1cd688e2c48ef3d74125e38b63eabdaab068a055c3e88" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1a99710fbb225d459d66def4dc2bb2cd4a9a0bdc8b799fc0621cfdd863be9c93" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-manylinux_2_34_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:f69365ee2b836939137de024a302395a1cb8654fb6dc5ffef6381105259c8f87" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:66cf8038893c7708ec345ffb3ac63c775d10f430f323ac2f0334fdb6a397c57c" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:e514c71ca72f3b56bd8fbda1a6a5b7d1100a2764b42a3c74a38841f25f9b00ab" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:7741e44f7938ec94f9a52678c8d19b7bc548522ffdc39c9e4481af8db545fa9a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_riscv64.whl", hash = "sha256:97e8a9674652496c7612b528085dd5a296c052a2edc466ca1bfb7b0b27820413" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_s390x.whl", hash = "sha256:23a793f2fed4dbf0517319759a2cded0b0dd8e8d3797fe30badd5693e320c175" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:b951113113ed4b8d173418a4f155c14b739dace626b3fa3f82be1831958d39e4" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-win32.whl", hash = "sha256:6430b34a2ae6fcc604672f4f913102563473d9a015bdca1ce8c95041cc1f2677" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-win_amd64.whl", hash = "sha256:08793876172551a930ce4d65c712cd516184d1a97070d4a1193e05bf0cf7040d" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/backports-zstd/1.6.0/backports_zstd-1.6.0-cp312-cp312-win_arm64.whl", hash = "sha256:03b7c59c71f7a597e2bcb3f8368371e9a660a1bdf1c37afc1f1ad1496a013c19" },
+]
+
+[[package]]
+name = "brotli"
+version = "1.2.0"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0.tar.gz", hash = "sha256:e310f77e41941c13340a95976fe66a8a95b01e783d430eeaf7a2f87e0a57dd0a" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:35d382625778834a7f3061b15423919aa03e4f5da34ac8e02c074e4b75ab4f84" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:7a61c06b334bd99bc5ae84f1eeb36bfe01400264b3c352f968c6e30a10f9d08b" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:acec55bb7c90f1dfc476126f9711a8e81c9af7fb617409a9ee2953115343f08d" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:260d3692396e1895c5034f204f0db022c056f9e2ac841593a4cf9426e2a3faca" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:072e7624b1fc4d601036ab3f4f27942ef772887e876beff0301d261210bca97f" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:adedc4a67e15327dfdd04884873c6d5a01d3e3b6f61406f99b1ed4865a2f6d28" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:7a47ce5c2288702e09dc22a44d0ee6152f2c7eda97b3c8482d826a1f3cfc7da7" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:af43b8711a8264bb4e7d6d9a6d004c3a2019c04c01127a868709ec29962b6036" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-win32.whl", hash = "sha256:e99befa0b48f3cd293dafeacdd0d191804d105d279e0b387a32054c1180f3161" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotli/1.2.0/brotli-1.2.0-cp312-cp312-win_amd64.whl", hash = "sha256:b35c13ce241abdd44cb8ca70683f20c0c079728a36a996297adb5334adfc1c44" },
+]
+
+[[package]]
+name = "brotlicffi"
+version = "1.2.0.1"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+dependencies = [
+    { name = "cffi" },
+]
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1.tar.gz", hash = "sha256:c20d5c596278307ad06414a6d95a892377ea274a5c6b790c2548c009385d621c" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:91ba5f0ccc040f6ff8f7efaf839f797723d03ed46acb8ae9408f99ffd2572cf4" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1-cp38-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:be9a670c6811af30a4bd42d7116dc5895d3b41beaa8ed8a89050447a0181f5ce" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:6f3314a3476f59e5443f9f72a6dff16edc0c3463c9b318feaef04ae3e4683f5a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1-cp38-abi3-win32.whl", hash = "sha256:82ea52e2b5d3145b6c406ebd3efb0d55db718b7ad996bd70c62cec0439de1187" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/brotlicffi/1.2.0.1/brotlicffi-1.2.0.1-cp38-abi3-win_amd64.whl", hash = "sha256:da2e82a08e7778b8bc539d27ca03cdd684113e81394bfaaad8d0dfc6a17ddede" },
+]
+
+[[package]]
 name = "certifi"
 version = "2026.6.17"
 source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
@@ -561,6 +620,7 @@ dependencies = [
     { name = "hydra-core" },
     { name = "ipykernel" },
     { name = "ipywidgets" },
+    { name = "kagglehub" },
     { name = "lightgbm" },
     { name = "matplotlib" },
     { name = "ninja" },
@@ -574,12 +634,14 @@ dependencies = [
     { name = "pmdarima" },
     { name = "polars" },
     { name = "prophet" },
+    { name = "py7zr" },
     { name = "pyarrow" },
     { name = "rotary-embedding-torch" },
     { name = "seaborn" },
     { name = "skforecast" },
     { name = "statsforecast" },
     { name = "statsmodels" },
+    { name = "tabicl" },
     { name = "tensorboard" },
     { name = "tirex-2" },
     { name = "torch" },
@@ -608,6 +670,7 @@ requires-dist = [
     { name = "hydra-core", specifier = ">=1.3.0" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "ipywidgets", specifier = ">=8.1.7" },
+    { name = "kagglehub", specifier = ">=1.0.2" },
     { name = "lightgbm", specifier = ">=4.6.0" },
     { name = "matplotlib", specifier = "==3.9.2" },
     { name = "ninja", specifier = ">=1.11.1.4" },
@@ -621,12 +684,14 @@ requires-dist = [
     { name = "pmdarima", specifier = ">=2.0.4" },
     { name = "polars", specifier = ">=1.31.0" },
     { name = "prophet", specifier = ">=1.3.0" },
+    { name = "py7zr", specifier = ">=1.1.3" },
     { name = "pyarrow", specifier = ">=20.0.0" },
     { name = "rotary-embedding-torch", specifier = "==0.8.6" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "skforecast", specifier = ">=0.23.0" },
     { name = "statsforecast", specifier = ">=2.0.3" },
     { name = "statsmodels", specifier = ">=0.14.5" },
+    { name = "tabicl", extras = ["forecast"], specifier = ">=2.0.1" },
     { name = "tensorboard", specifier = ">=2.19.0" },
     { name = "tirex-2", specifier = ">=0.1.1" },
     { name = "torch", specifier = ">=2.4.1" },
@@ -871,6 +936,24 @@ wheels = [
 ]
 
 [[package]]
+name = "inflate64"
+version = "1.0.4"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4.tar.gz", hash = "sha256:b398c686960c029777afc0ed281a86f66adb956cfc3fbf6667cc6453f7b407ce" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:c8009e4a4918ee6c8cbc49e58fe159464895064cfdf0565fed3f49ca81e45272" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:0d173a7a0e865bb7d19685c5b1ad2994712b8361b24136d7e94abeff58505647" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:8bad992f2d034f5f7e36208e54502d1b0829ce772c898e5dc59109833420148a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6bfcf806912ced77a21394f7363805ecacd626b79f93cba87d505a48e88ede78" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:62d1aac3aba094ae42e27ce7581b414c90f218248be0953b6aeb11a127225e5d" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:8065166f355122484f004225b379d403346bdae69ec624786a9334f025580675" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:94a95f32087d223d2e119ff5c7c264109e8d4cb7e421e7a688a899a6fe021b38" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-win32.whl", hash = "sha256:ad4fa490bb7dc2a4640a3adaa2d5950f4a465ba034bbcf184c2103646e58ad97" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-win_amd64.whl", hash = "sha256:2c6befdf83d088a6e0d10d0873a9d4bfde2ce00ad7a52c8189cf303306f98030" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/inflate64/1.0.4/inflate64-1.0.4-cp312-cp312-win_arm64.whl", hash = "sha256:2b263c619469f90a75f29c421c53d31b208ad494a078235a8f6db2bc96583fdc" },
+]
+
+[[package]]
 name = "inquirerpy"
 version = "0.3.4"
 source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
@@ -1042,6 +1125,35 @@ source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
 sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/jupyterlab-widgets/3.0.16/jupyterlab_widgets-3.0.16.tar.gz", hash = "sha256:423da05071d55cf27a9e602216d35a3a65a3e41cdf9c5d3b643b814ce38c19e0" }
 wheels = [
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/jupyterlab-widgets/3.0.16/jupyterlab_widgets-3.0.16-py3-none-any.whl", hash = "sha256:45fa36d9c6422cf2559198e4db481aa243c7a32d9926b500781c830c80f7ecf8" },
+]
+
+[[package]]
+name = "kagglehub"
+version = "1.0.2"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+dependencies = [
+    { name = "kagglesdk" },
+    { name = "packaging" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/kagglehub/1.0.2/kagglehub-1.0.2.tar.gz", hash = "sha256:08abae0c1e249904003ce6f23c189166e3032220478426a552c77c2edb08b93a" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/kagglehub/1.0.2/kagglehub-1.0.2-py3-none-any.whl", hash = "sha256:ffad2d79cfda9b06848e98cb0a4a48e286285cfba4aeadadc0b8dbd9bcadd372" },
+]
+
+[[package]]
+name = "kagglesdk"
+version = "0.1.34"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+dependencies = [
+    { name = "protobuf" },
+    { name = "requests" },
+]
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/kagglesdk/0.1.34/kagglesdk-0.1.34.tar.gz", hash = "sha256:0c0a7a1a9db477bee4fa194e411e80fd8d93ba73977da400175522f1cf92da58" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/kagglesdk/0.1.34/kagglesdk-0.1.34-py3-none-any.whl", hash = "sha256:eac37bca83afa20973d0895cc11505f0d502ba46a22a545728ed65e2761a6dcd" },
 ]
 
 [[package]]
@@ -1268,6 +1380,15 @@ wheels = [
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/multiprocess/0.70.16/multiprocess-0.70.16-py312-none-any.whl", hash = "sha256:fc0544c531920dde3b00c29863377f87e1632601092ea2daca74e4beb40faa2e" },
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/multiprocess/0.70.16/multiprocess-0.70.16-py38-none-any.whl", hash = "sha256:a71d82033454891091a226dfc319d0cfa8019a4e888ef9ca910372a446de4435" },
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/multiprocess/0.70.16/multiprocess-0.70.16-py39-none-any.whl", hash = "sha256:a0bafd3ae1b732eac64be2e72038231c1ba97724b60b09400d68f229fcc2fbf3" },
+]
+
+[[package]]
+name = "multivolumefile"
+version = "0.2.3"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/multivolumefile/0.2.3/multivolumefile-0.2.3.tar.gz", hash = "sha256:a0648d0aafbc96e59198d5c17e9acad7eb531abea51035d08ce8060dcad709d6" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/multivolumefile/0.2.3/multivolumefile-0.2.3-py3-none-any.whl", hash = "sha256:237f4353b60af1703087cf7725755a1f6fcaeeea48421e1896940cd1c920d678" },
 ]
 
 [[package]]
@@ -1873,6 +1994,27 @@ source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
 sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pure-sasl/0.6.2/pure-sasl-0.6.2.tar.gz", hash = "sha256:53c1355f5da95e2b85b2cc9a6af435518edc20c81193faa0eea65fdc835138f4" }
 
 [[package]]
+name = "py7zr"
+version = "1.1.3"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+dependencies = [
+    { name = "backports-zstd" },
+    { name = "brotli", marker = "platform_python_implementation == 'CPython'" },
+    { name = "brotlicffi", marker = "platform_python_implementation == 'PyPy'" },
+    { name = "inflate64" },
+    { name = "multivolumefile" },
+    { name = "psutil", marker = "sys_platform != 'cygwin'" },
+    { name = "pybcj" },
+    { name = "pycryptodomex" },
+    { name = "pyppmd" },
+    { name = "texttable" },
+]
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/py7zr/1.1.3/py7zr-1.1.3.tar.gz", hash = "sha256:8d51894abb38355bf14881088bb97f01fe4cb5b14ebe22f66d6297668c7e1a74" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/py7zr/1.1.3/py7zr-1.1.3-py3-none-any.whl", hash = "sha256:17934a35089e026dec6c72ee275d9b841e646881ef822d618e805c3006661d9a" },
+]
+
+[[package]]
 name = "pyarrow"
 version = "24.0.0"
 source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
@@ -1897,12 +2039,48 @@ wheels = [
 ]
 
 [[package]]
+name = "pybcj"
+version = "1.0.8"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8.tar.gz", hash = "sha256:6818270692912d47e81ccd777b7d0ed2ad3a19ef7aaead3735b38048c80bf368" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:748af4545040da68dfae8cdf9f902ac7c29f209aaf6450a970abe0302d1b0f58" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:190e21c3bdb6b28c63999889668a3f80f5d7eb13b957f2dfda53c9ddeb3d946a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:384b25dfe66868329a3872c6eae668033e009e4e86754eba3a70b656c9eb4208" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b480efcd66cfb4533ede6c3d67224ff477c8dd661613826edff9c95921a562d6" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a50b58f9b9d9978c55e3219b6816a1021a778b028a810b36aa754407591cb5ae" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:1997badf9e59221470f84e193ac8c1bab158acfe6b058ffdc28c331807967ff9" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:4f0818cf48fbfddbae487536f3fcd69cfadfb7293630ab8658b66e89a0836d6a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-win_amd64.whl", hash = "sha256:26e3e4d287f306996902289fc0e88b36d0fc817802f4fc4537b40a6518726585" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pybcj/1.0.8/pybcj-1.0.8-cp312-cp312-win_arm64.whl", hash = "sha256:82d2e46eff6c3fe8d16f6515f9ab0598eb960af9a2218907c5e0e9f993d7a666" },
+]
+
+[[package]]
 name = "pycparser"
 version = "3.0"
 source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
 sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycparser/3.0/pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29" }
 wheels = [
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycparser/3.0/pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992" },
+]
+
+[[package]]
+name = "pycryptodomex"
+version = "3.23.0"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0.tar.gz", hash = "sha256:71909758f010c82bc99b0abf4ea12012c98962fbf0583c2164f8b84533c2e4da" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:06698f957fe1ab229a99ba2defeeae1c09af185baa909a31a5d1f9d42b1aaed6" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-macosx_10_9_x86_64.whl", hash = "sha256:b2c2537863eccef2d41061e82a881dcabb04944c5c06c5aa7110b577cc487545" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:43c446e2ba8df8889e0e16f02211c25b4934898384c1ec1ec04d7889c0333587" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f489c4765093fb60e2edafdf223397bc716491b2b69fe74367b70d6999257a5c" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bdc69d0d3d989a1029df0eed67cc5e8e5d968f3724f4519bd03e0ec68df7543c" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:6bbcb1dd0f646484939e142462d9e532482bc74475cecf9c4903d4e1cd21f003" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-musllinux_1_2_i686.whl", hash = "sha256:8a4fcd42ccb04c31268d1efeecfccfd1249612b4de6374205376b8f280321744" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:55ccbe27f049743a4caf4f4221b166560d3438d0b1e5ab929e07ae1702a4d6fd" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-win32.whl", hash = "sha256:189afbc87f0b9f158386bf051f720e20fa6145975f1e76369303d0f31d1a8d7c" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-win_amd64.whl", hash = "sha256:52e5ca58c3a0b0bd5e100a9fbc8015059b05cffc6c66ce9d98b4b45e023443b9" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pycryptodomex/3.23.0/pycryptodomex-3.23.0-cp37-abi3-win_arm64.whl", hash = "sha256:02d87b80778c171445d67e23d1caef279bf4b25c3597050ccd2e13970b57fd51" },
 ]
 
 [[package]]
@@ -1976,6 +2154,24 @@ source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
 sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyparsing/3.3.2/pyparsing-3.3.2.tar.gz", hash = "sha256:c777f4d763f140633dcb6d8a3eda953bf7a214dc4eff598413c070bcdc117cbc" }
 wheels = [
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyparsing/3.3.2/pyparsing-3.3.2-py3-none-any.whl", hash = "sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d" },
+]
+
+[[package]]
+name = "pyppmd"
+version = "1.3.1"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1.tar.gz", hash = "sha256:ced527f08ade4408c1bfc5264e9f97ffac8d221c9d13eca4f35ec1ec0c7b6b2e" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:3faa58ab2ebe3b13ec23b1904639d687fb727270d2962fd2d239ca00fd6eb865" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:27703f041ee96912a5410fd3ce31c5cde32f9323bd67f72f100bd960ee67bf13" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e773d8353b36f7e7973a43526993fb276b98a97839cb5dc8f4e6465ad873f41a" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:37b1883accf840cb0b711785d353f8548853a1401d381da007c0aec362f3ffac" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1bd6d179ad39b6191ca0cbe62fb9592f33f49277b4384ad7bc5eb0e6ca27ebee" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:806cf8d33606e44bf5ff5786c57891f57993f1eef1c763da3c58ea97de3a13c8" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:1826cbce9a2c944aa08df79310a7e6d4a61fd20636b6dff64a77ea4bc43da30f" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-win32.whl", hash = "sha256:d3ff96671319318d941dd34300d641745048e8a3251b077bddf98652d6ddc513" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-win_amd64.whl", hash = "sha256:c8c1ad39e7ebde71bf5a54cf61f489bf4790f1dd0beb70dc2e8f5ad3329d7ca7" },
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/pyppmd/1.3.1/pyppmd-1.3.1-cp312-cp312-win_arm64.whl", hash = "sha256:391b2bf76d7dc45b343781754d0b734dcbf539b92667986a343f5488c4bf9ca0" },
 ]
 
 [[package]]
@@ -2348,6 +2544,25 @@ wheels = [
 ]
 
 [[package]]
+name = "tabicl"
+version = "2.0.1"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+dependencies = [
+    { name = "einops" },
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "psutil" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "torch" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/tabicl/2.0.1/tabicl-2.0.1.tar.gz", hash = "sha256:1659539bb71f157458c3fbfee249492c1abf31f6ea8f2c5e7db19f89cd5f7ac9" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/tabicl/2.0.1/tabicl-2.0.1-py3-none-any.whl", hash = "sha256:9c8a477e42cfa0bdef87e59e63699c84b17dfc146f4a50ad9b35897796d802af" },
+]
+
+[[package]]
 name = "tensorboard"
 version = "2.20.0"
 source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
@@ -2375,6 +2590,15 @@ wheels = [
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/tensorboard-data-server/0.7.2/tensorboard_data_server-0.7.2-py3-none-any.whl", hash = "sha256:7e0610d205889588983836ec05dc098e80f97b7e7bbff7e994ebb78f578d0ddb" },
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/tensorboard-data-server/0.7.2/tensorboard_data_server-0.7.2-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:9fe5d24221b29625dbc7328b0436ca7fc1c23de4acf4d272f1180856e32f9f60" },
     { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/tensorboard-data-server/0.7.2/tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl", hash = "sha256:ef687163c24185ae9754ed5650eb5bc4d84ff257aabdc33f0cc6f74d8ba54530" },
+]
+
+[[package]]
+name = "texttable"
+version = "1.7.0"
+source = { registry = "https://nexus.retd.edf.fr/repository/pypi-all/simple" }
+sdist = { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/texttable/1.7.0/texttable-1.7.0.tar.gz", hash = "sha256:2d2068fb55115807d3ac77a4ca68fa48803e84ebb0ee2340f858107a36522638" }
+wheels = [
+    { url = "https://nexus.retd.edf.fr/repository/pypi-all/packages/texttable/1.7.0/texttable-1.7.0-py2.py3-none-any.whl", hash = "sha256:72227d592c82b3d7f672731ae73e4d1f88cd8e2ef5b075a7a7f01a23a3743917" },
 ]
 
 [[package]]

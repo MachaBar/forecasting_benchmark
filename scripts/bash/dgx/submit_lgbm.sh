@@ -14,8 +14,14 @@ set -euo pipefail
 mkdir -p jobs
 source .venv/bin/activate
 
-srun python -u -m src.baselines.run_lgbm \
+# srun python -u -m src.baselines.run_lgbm \
+#     dataset=cer_bis \
+#     dataset.context_length=1440 \
+#     dataset.prediction_length=96 \
+#     model.probabilistic=true
+
+srun python -u -m src.baselines.run_lgbm_variants --multirun \
     dataset=cer_bis \
-    dataset.context_length=1440 \
-    dataset.prediction_length=96 \
-    model.probabilistic=true
+    model.variant=global,global_calendar,per_hour,per_hour_calendar \
+    dataset.context_length=144,336,672,1440 \
+    dataset.prediction_length=96,336 \

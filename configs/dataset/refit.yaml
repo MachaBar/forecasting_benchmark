@@ -1,0 +1,19 @@
+# @package _global_.dataset
+path: /home/d32485/forecasting_benchmark/data/refit/refit_load_curve.parquet
+path_client_split: /home/d32485/forecasting_benchmark/data/refit/refit_train_valid_test_id_split.pkl
+timestamp_col: "time"
+layout: "wide"
+
+# 30-min resolution, identical to cer_bis -> results directly comparable
+context_length: 1440       # 30 days
+prediction_length: 96      # 2 days
+stride: 96
+
+name: "refit"
+ratios: "0.7,0.15,0.15"
+season_length: 48          # same as CER: no model.season_length override needed
+
+cutoff_mode: "random"
+cutoff_gap_min: 24         # 12h
+cutoff_gap_max: 96         # 48h
+cutoff_seed: 42

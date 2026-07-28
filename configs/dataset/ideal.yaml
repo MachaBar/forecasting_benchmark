@@ -1,0 +1,21 @@
+# @package _global_.dataset
+path: /home/d32485/forecasting_benchmark/data/ideal/ideal_load_curve.parquet
+path_client_split: /home/d32485/forecasting_benchmark/data/ideal/ideal_train_valid_test_id_split.pkl
+timestamp_col: "time"
+layout: "wide"
+
+# IDEAL is HOURLY (CER is 30-min): every step count is halved for equal duration
+context_length: 720        # 30 days
+prediction_length: 48      # 2 days
+stride: 48
+
+name: "ideal"
+ratios: "0.7,0.15,0.15"
+
+season_length: 24          # daily cycle at hourly resolution
+
+# same random-cutoff scheme as cer_bis, rescaled to hourly
+cutoff_mode: "random"
+cutoff_gap_min: 12         # 12h
+cutoff_gap_max: 48         # 48h
+cutoff_seed: 42
