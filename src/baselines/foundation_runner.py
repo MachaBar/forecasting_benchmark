@@ -195,6 +195,7 @@ def run_foundation_eval(cfg, adapter: ForecastAdapter, output_dir: Path,
         "quantile_levels": quantile_levels,
         "batch_size": batch_size,
         "probabilistic": bool(is_prob),
+        **getattr(adapter, "meta", {}),
         "timing": timing,
     }
     with open(output_dir / "eval_info.json", "w") as f:
@@ -219,6 +220,8 @@ def run_foundation_eval(cfg, adapter: ForecastAdapter, output_dir: Path,
     summary_row["stride"] = cfg.dataset.stride
     summary_row["batch_size"] = batch_size
     summary_row["probabilistic"] = bool(is_prob)
+    for k, v in getattr(adapter, "meta", {}).items():
+        summary_row[k] = v
     summary_row["model_load_s"] = timing["model_load_s"]
     summary_row["total_eval_s"] = timing["total_eval_s"]
     summary_row["pure_inference_s"] = timing["pure_inference_s"]

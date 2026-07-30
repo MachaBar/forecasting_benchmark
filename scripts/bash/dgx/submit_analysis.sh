@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --wckey=p11mh:python
-#SBATCH --partition=h100-bis
+#SBATCH --partition=a100
 #SBATCH --time=6-00:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
@@ -26,12 +26,16 @@ source .venv/bin/activate
 
 # python -u -m src.dataset.prepare_ideal --pareto
 
-# # 2. build the two artefacts
+# # build the two artefacts
 # python -m src.dataset.prepare_ideal --min-timesteps 8760
+
+# une seule lecture du zip, tout est caché ensuite
+python -u -m src.dataset.prepare_ideal --plot
+
 
 # REFIT dataset
 
-python -u -m src.dataset.prepare_refit --inspect     # confirme format CSV + liste des maisons
+# python -u -m src.dataset.prepare_refit --inspect     # confirme format CSV + liste des maisons
 # python -u -m src.dataset.prepare_refit --periods     # couverture par maison
 # python -u -m src.dataset.prepare_refit --scan        # compromis clients/durée
 # python -u -m src.dataset.prepare_refit --pareto      # toutes les combinaisons atteignables

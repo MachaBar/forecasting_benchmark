@@ -11,9 +11,7 @@ Probabilistic metrics (CRPS, WQL) expect either a dict of quantile
 forecasts or Monte Carlo samples.
 
 All functions operate on 1-D arrays (one forecast horizon at a time, for
-one client at one cutoff) — aggregate across clients/cutoffs yourself
-afterward (e.g. with a results dataframe and groupby, as in
-run_statistical_baselines.py).
+one client at one cutoff).
 """
 
 from __future__ import annotations

@@ -29,7 +29,8 @@ source .venv/bin/activate
 srun python -u -m src.baselines.run_foundation --multirun \
     model=chronos dataset=cer_bis model.probabilistic=true \
     model.weights_path=/home/d32485/timetensor/src/timetensor/sota/chronos2/weights \
-    dataset.context_length=144,336,672,1440,2500  \
+    model.cross_learning=true,false \
+    dataset.context_length=144,336,672,1440,2200  \
     dataset.prediction_length=336,96
 
 

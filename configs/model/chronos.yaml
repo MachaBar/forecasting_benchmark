@@ -5,7 +5,7 @@ weights_path: "/home/d32485/timetensor/src/timetensor/sota/chronos2/weights"
 device_map: "cuda"
 torch_dtype: "bfloat16"
 
-batch_size: 32
+batch_size: 32 # 100 
 num_samples: 20
 
 # Probabilistic output: predict_quantiles() returns these levels
@@ -34,3 +34,5 @@ use_validation: true
 lora_r: 8
 lora_alpha: 16
 lora_dropout: 0.05
+
+cross_learning : false

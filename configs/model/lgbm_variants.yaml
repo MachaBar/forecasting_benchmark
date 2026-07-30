@@ -3,14 +3,27 @@ name: "lgbm_variants"
 
 variant: "global"     # global | global_calendar | per_hour | per_hour_calendar
 
-n_estimators: 300
-learning_rate: 0.05
+n_estimators: 3000
+learning_rate: 0.03
 max_depth: -1
 num_leaves: 31
 n_jobs: -1
 
-lags: [1, 2, 3, 48, 96, 336]
+
+
+early_stopping_rounds: 50   # null → comportement historique (n_estimators fixe)
+val_mode: "both"             # clients | temporal | both
+
+# lags: [1, 2, 3, 48, 96, 144, 336, 672, 1008, 1440]
 n_samples: 200000      # training rows sampled (client, t) pairs
+
+# sparse = la liste `lags` ci-dessous (features creuses, comparables entre
+# variants) ; dense = tous les lags 1..lags_dense_n, comme le script de Yanis.
+# Le mode fait partie du nom du modèle (LGBM-<variant>[-dense]) pour que les
+# deux jeux de features ne se mélangent pas dans summary_all_runs.csv.
+lag_mode: "sparse"     # sparse | dense
+lags: [1, 2, 3, 48, 96, 336]
+lags_dense_n: 336      # utilisé seulement si lag_mode=dense (336 = 7j en 30-min)
 
 season_length: 48
 include_mape: false

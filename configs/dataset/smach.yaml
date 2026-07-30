@@ -1,7 +1,7 @@
 # @package _global_.dataset
-path: ???
-path_client_split: ???
-timestamp_col: "time"
+path: /home/d32485/forecasting_benchmark/data/smach/load_curve.parquet
+path_client_split: /home/d32485/forecasting_benchmark/data/smach/train_valid_test_id_split.pkl
+timestamp_col: "HORODATAGE"
 layout: "wide"
 
 context_length: 512
@@ -9,3 +9,4 @@ prediction_length: 96
 stride: 96
 
 name: "smach"
+ratios: "0.7,0.15,0.15"
