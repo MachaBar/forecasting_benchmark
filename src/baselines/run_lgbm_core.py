@@ -215,7 +215,7 @@ def build_training_table_direct(
     X = pd.DataFrame(lag_cols)
 
     Y = np.stack(
-        [ts.values[r + i + 1, clients] for i in range(horizon)], axis=1
+        [ts.values[r + i + 1, clients] for i in range(horizon)], axis=0
     ).astype(np.float32)
 
     dt_all = pd.DatetimeIndex(ts.datetimes)
@@ -237,7 +237,7 @@ def fit_direct(
             for name, values in cyclical_features(target_dt).items():
                 Xi[name] = values
         m = LGBMRegressor(**lgbm_kwargs)
-        m.fit(Xi, Y[:, i])
+        m.fit(Xi, Y[i])
         models[i] = m
     return models
 

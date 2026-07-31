@@ -35,5 +35,6 @@ python -m src.baselines.run_lgbm_variants --multirun \
     dataset=cer_bis \
     model.variant=direct \
     model.lag_mode=sparse,dense \
-    dataset.context_length=144,336 \
+    dataset.context_length=144,336,672,1440,2200 \
     dataset.prediction_length=96,336 \
+    model.lags_dense_n='${dataset.context_length}' \

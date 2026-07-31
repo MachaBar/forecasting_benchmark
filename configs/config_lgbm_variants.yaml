@@ -10,4 +10,5 @@ hydra:
     dir: outputs/lgbm_variants/${dataset.name}/${model.variant}/${now:%Y-%m-%d_%H-%M-%S}
   sweep:
     dir: outputs/lgbm_variants/${dataset.name}/multirun_${now:%Y-%m-%d_%H-%M-%S}
-    subdir: ${model.variant}_ctx${dataset.context_length}_h${dataset.prediction_length}
+    subdir: ${model.variant}_${model.lag_mode}_ctx${dataset.context_length}_h${dataset.prediction_length}
+    # subdir: ${model.variant}_ctx${dataset.context_length}_h${dataset.prediction_length}
